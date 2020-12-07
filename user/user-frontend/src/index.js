@@ -11,7 +11,9 @@ ReactDOM.render(
     <BrowserRouter>
       <Route exact path="/" component={Login} ></Route>
       <Route exact path="/register" component={Register} ></Route>
-      <ProtectedRoute path="/hall" component={Hall}></ProtectedRoute>
+      <Route exact path="/hall" component={Hall} ></Route>
+
+      {/* <ProtectedRoute path="/hall" component={Hall}></ProtectedRoute> */}
 
     </BrowserRouter>
   </React.StrictMode>,

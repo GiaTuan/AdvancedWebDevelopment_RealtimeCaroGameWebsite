@@ -4,24 +4,53 @@
  * Module dependencies.
  */
 
- require('dotenv').config();
-var app = require('../app');
-var debug = require('debug')('user-backend:server');
-var http = require('http');
+require('dotenv').config();
+const app = require('../app');
+const debug = require('debug')('user-backend:server');
+const http = require('http');
+const socketIO = require('socket.io');
+const accountService = require('../components/account/accountService');
+const { use } = require('passport');
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
 
+const server = http.createServer(app);
+const io = socketIO(server,{
+  cors: {
+    origin: '*'
+  }
+});
+
+const users = {};
+
+io.on("connection", (socket) => {
+  socket.on("connect-to-server", userId=>{
+    users[socket.id] = userId;
+    //const usersOnline = accountService.getUserFromId(userId);
+    // (async() => {
+    //     const user = await accountService.getUserFromId(userId);
+    //     console.log("hahahaha");
+    //     console.log(user)
+    // })
+    //console.log(usersOnline);
+    socket.emit("online",users);
+    socket.broadcast.emit("online",users);
+  })
+  socket.on("disconnect", () => {
+    delete users[socket.id];
+    socket.broadcast.emit("online",users);
+  })
+})
 /**
  * Listen on provided port, on all network interfaces.
  */

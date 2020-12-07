@@ -28,3 +28,26 @@ module.exports.authenAccount = async (username,password) => {
     }
     else return [false,null];
 }
+
+module.exports.getUserFromId = async (userId) => {
+    const user = await db.account.findAll({
+        where: {
+            id: userId
+        }
+    })
+    if(user.length > 0)
+    {
+       return user[0];
+    }
+    return null;
+}
+
+module.exports.getAllUsers = async () => {
+    const users = await db.account.findAll({
+        attributes: ['id','username','name','email','phone'],
+        where: {
+            isadmin: false
+        }
+    });
+    return users;
+}
