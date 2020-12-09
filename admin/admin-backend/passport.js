@@ -1,8 +1,9 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const passportJWT = require('passport-jwt');
-const ExtractJWT = passportJWT.ExtractJwt;
-const JWTStrategy = passportJWT.Strategy;
+const passportJWT = require("passport-jwt");
+const ExtractJwt = passportJWT.ExtractJwt;
+const JwtStrategy = passportJWT.Strategy;
+
 
 const accountService = require('./components/account/accountService');
 
@@ -15,16 +16,14 @@ passport.use(new LocalStrategy({session: false}, async (username, password, done
         done(null, false)
 }));
 
-// const JWTOptions = {};
 
-// JWTOptions.jwtFromRequest = ExtractJWT.fromAuthHeaderAsBearerToken();
-// JWTOptions.serectOrKey = process.env.JWT_SERECT;
-const JWTOptions = {
-    jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-    secretOrKey: process.env.JWT_SERECT
-};
+const JWTOptions ={};
 
-passport.use(new JWTStrategy(JWTOptions, function(jwt_payload, done) {
+JWTOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+JWTOptions.secretOrKey = process.env.JWT_SECRET;
+
+
+passport.use(new JwtStrategy(JWTOptions, function(jwt_payload, done) {
     done(null, jwt_payload);
 }));
 

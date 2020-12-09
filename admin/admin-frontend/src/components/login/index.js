@@ -82,7 +82,7 @@ export default function Login(props){
                 <CssBaseline></CssBaseline>
                 <Grid container justify="center" alignItems="center" direction="column" style={{height: '100vh'}}>
                     <Grid item >
-                        <Typography variant={"h4"}>Caro Game</Typography>
+                        <Typography variant={"h4"}>Caro Game Admin</Typography>
                     </Grid>
                     <br></br>
                     <br></br>
@@ -101,9 +101,7 @@ export default function Login(props){
                                     Login
                                 </Button>
                             </form>
-                                <br></br>
-                                <br></br>
-                                <Typography style={{textAlign: 'center'}}>or <Link to="/register">Register</Link> </Typography>
+                                
                         </Paper>
                     </Grid>
                 </Grid>

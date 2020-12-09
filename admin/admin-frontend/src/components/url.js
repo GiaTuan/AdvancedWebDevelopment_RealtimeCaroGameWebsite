@@ -1,13 +1,13 @@
 class URL{
     constructor(){
-        this.isDev = true;
+        this.isDev = false;
     }
     getUrl(){
         if(this.isDev)
         {
             return "http://localhost:3000/";
         }
-        return "";
+        return "https://gameonline-admin-api.herokuapp.com/";
     }
 }
 
