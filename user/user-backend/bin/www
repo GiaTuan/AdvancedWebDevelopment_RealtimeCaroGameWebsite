@@ -9,8 +9,10 @@ const app = require('../app');
 const debug = require('debug')('user-backend:server');
 const http = require('http');
 const socketIO = require('socket.io');
-const accountService = require('../components/account/accountService');
 const { use } = require('passport');
+const gameService = require('../components/game/gameService');
+const chatService = require('../components/chat/chatService');
+const { chat } = require('../connection');
 
 /**
  * Get port from environment and store in Express.
@@ -31,21 +33,71 @@ const io = socketIO(server,{
   }
 });
 
+
+const addDataToGameUser  = async (idUser,idGame) => {
+  await gameService.addDataToGameUser(idUser,idGame);
+}
+
+const addChat = async(idGame,idUser,text) => {
+  await chatService.addChat(idGame,idUser,text);
+}
+
+const getChat = async(idGame) => {
+  const result = await chatService.getChat(idGame);
+  console.log(JSON.stringify(result));
+  return result;
+}
+
+const deleteChat = async(idGame) => {
+  await chatService.deleteChat(idGame);
+}
+
+
 const users = {};
 
 io.on("connection", (socket) => {
   socket.on("connect-to-server", userId=>{
     users[socket.id] = userId;
-    //const usersOnline = accountService.getUserFromId(userId);
-    // (async() => {
-    //     const user = await accountService.getUserFromId(userId);
-    //     console.log("hahahaha");
-    //     console.log(user)
-    // })
-    //console.log(usersOnline);
     socket.emit("online",users);
     socket.broadcast.emit("online",users);
   })
+
+  socket.on("join", data => {
+    const room = io.sockets.adapter.rooms.get(data.idGame);
+    let size = 0;
+    if(room !== undefined)
+    {
+      size = room.size;
+    }
+    if(size === 2)
+    {
+      socket.emit("join-respond", {success: false});
+    }
+    else 
+    {
+      socket.join(data.idGame);
+      addDataToGameUser(data.idUser,data.idGame);
+      socket.emit("join-respond", {success: true});
+    }
+
+  })
+
+  socket.on("leave", async (data) => {
+    socket.leave(data.idGame);
+
+    const room = io.sockets.adapter.rooms.get(data.idGame);
+    if(room === undefined)
+    {
+      await deleteChat(data.idGame);
+    }
+  })
+
+  socket.on("chat", async (data)=>{
+    await addChat(data.idGame,data.idUser,data.text);
+    const chatHistory = await getChat(data.idGame);
+    io.to(data.idGame).emit("chat-respond",chatHistory);
+  })
+
   socket.on("disconnect", () => {
     delete users[socket.id];
     socket.broadcast.emit("online",users);

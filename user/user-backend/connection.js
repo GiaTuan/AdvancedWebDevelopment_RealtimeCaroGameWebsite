@@ -19,13 +19,45 @@ const sequelize = new Sequelize(process.env.DEV_DB_NAME, process.env.DEV_DB_USER
   db.sequelize = sequelize;
 
   db.account = require('./components/account/accountModel')(sequelize,Sequelize);
+  db.game = require('./components/game/gameModel')(sequelize,Sequelize);
+  db.gameUser = require('./components/game/gameUserModel')(sequelize,Sequelize);
+  db.chat = require('./components/chat/chatModel')(sequelize,Sequelize);
 
-  //example code for one-many relation
-  // db.users.hasMany(db.boards, {
-  //   foreignKey: 'id_user'
+  db.game.hasMany(db.gameUser, {
+    foreignKey: 'idgame'
+  });
+  db.gameUser.belongsTo(db.game , {
+    foreignKey: 'idgame'
+  });
+
+  db.account.hasMany(db.gameUser, {
+    foreignKey: 'iduser'
+  });
+  db.gameUser.belongsTo(db.account , {
+    foreignKey: 'iduser'
+  });
+
+
+  db.game.hasMany(db.chat, {
+    foreignKey: 'idgame'
+  });
+  db.chat.belongsTo(db.game , {
+    foreignKey: 'idgame'
+  });
+
+  db.account.hasMany(db.chat, {
+    foreignKey: 'iduser'
+  });
+  db.chat.belongsTo(db.account , {
+    foreignKey: 'iduser'
+  });
+
+
+  // db.account.hasMany(db.gameUser, {
+  //   foreignKey: 'iduser'
   // });
-  // db.boards.belongsTo(db.users , {
-  //   foreignKey: 'id_user'
+  // db.gameUser.belongsTo(db.account , {
+  //   foreignKey: 'iduser'
   // });
 
   module.exports = db;

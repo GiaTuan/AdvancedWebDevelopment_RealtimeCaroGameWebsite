@@ -1,6 +1,6 @@
 class URL{
     constructor(){
-        this.isDev = false;
+        this.isDev = true;
     }
     getUrl(){
         if(this.isDev)

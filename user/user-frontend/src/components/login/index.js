@@ -60,10 +60,13 @@ export default function Login(props){
         if(response.ok)
         { 
             const data = await response.json();
-            localStorage.setItem("id",data.account.id);
+        //    localStorage.setItem("id",data.account.id);
             localStorage.setItem('token',data.token); 
             Auth.logIn(() => {
-                props.history.push("/hall");
+                props.history.push({
+                    pathname: "/hall",
+                    state: { idUser: data.account.id}
+                });
             });               
         }
         else setMessage("Username or password is not correct")

@@ -40,11 +40,11 @@ export default function ListUser({usersOnline})
 
     const classes = useStyles();
     return (
-        <Grid container direction="column" className={classes.userContainer} spacing={2}>
+        <Grid container direction="column" className={classes.userContainer}>
             <Typography>LIST OF USERS</Typography>
             {
                 users.map((u,key) => (
-                    Object.values(usersOnline).indexOf(u.id.toString()) >= 0 ?
+                    Object.values(usersOnline).indexOf(u.id) >= 0 ?
                         <Grid item key={key} >
                             <Typography><FiberManualRecordIcon className={[classes.stateUserIconColorOnline,classes.stateUserIcon].join(" ")}></FiberManualRecordIcon>{u.name}</Typography>
                         </Grid>

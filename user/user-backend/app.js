@@ -13,6 +13,7 @@ const passport = require('./passport');
 const loginRouter = require('./components/login');
 const registerRouter = require('./components/register');
 const userRouter = require('./components/user');
+const gameRouter = require('./components/game');
 const app = express();
 
 
@@ -32,6 +33,7 @@ app.use(passport.initialize());
 app.use('/login',loginRouter);
 app.use('/register',registerRouter);
 app.use('/users',userRouter);
+app.use('/game',gameRouter);
 
 
 //=============================================================================

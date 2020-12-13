@@ -5,15 +5,16 @@ import Login from './components/login';
 import Register from './components/register';
 import ProtectedRoute from './components/protectedRoute';
 import Hall from './components/hall';
+import Game from './components/game';
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <Route exact path="/" component={Login} ></Route>
       <Route exact path="/register" component={Register} ></Route>
-      <Route exact path="/hall" component={Hall} ></Route>
+      <ProtectedRoute path="/hall" component={Hall}></ProtectedRoute>
+      <ProtectedRoute path="/game/:id" component={Game}></ProtectedRoute>
 
-      {/* <ProtectedRoute path="/hall" component={Hall}></ProtectedRoute> */}
 
     </BrowserRouter>
   </React.StrictMode>,
