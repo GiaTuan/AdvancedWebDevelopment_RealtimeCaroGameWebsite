@@ -2,8 +2,8 @@ const { game } = require('../../connection');
 const gameService = require('./gameService');
 
 module.exports.getNewGame = async (req,res,next) => {
-    const idNewGame = await gameService.getNewGameId();
-    res.json(idNewGame);
+    const newGame = await gameService.getNewGame();
+    res.json(newGame);
 }
 
 module.exports.checkGameId = async (req,res,next) => {

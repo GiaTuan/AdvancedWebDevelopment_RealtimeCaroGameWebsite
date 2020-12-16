@@ -9,14 +9,13 @@ const useStyles = makeStyles({
 });
 
 export default function Chat({chatHistory,handleChangeText,handleSubmitChat}){
-    console.log(chatHistory);
     const classes = useStyles();
     return(
         <Box>
             <Box cellHeight={160} className={classes.chatBox}>
                 {
                     chatHistory.map((value,key) => (
-                    <Typography key={key}>{value.iduser}: {value.content}</Typography>
+                    <Typography key={key}>{Object.keys(value)}: {value[Object.keys(value)]}</Typography>
                     ))
                 }
             </Box>

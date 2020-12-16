@@ -1,8 +1,8 @@
 const db = require('../../connection');
 
-module.exports.getNewGameId = async () => {
-    const newGameId = await db.game.create();
-    return newGameId;
+module.exports.getNewGame = async () => {
+    const newGame = await db.game.create();
+    return newGame;
 }
 
 module.exports.checkGameId = async (id) => {

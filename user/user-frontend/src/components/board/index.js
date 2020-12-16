@@ -2,22 +2,19 @@ import { Box, Button } from '@material-ui/core';
 import React from 'react';
 import Square from '../square';
 
-export default function Board(props){
-    const nRows = 50;
-    const nCols = 50;
-    const squares = new Array(nRows*nCols).fill(0);
+export default function Board({board,handleClickSquare}){
+    // const nRows = 20;
+    // const nCols = 20;
+    // const squares = new Array(nRows*nCols).fill(0);
+    
 
-    const handleClickSquare = (i) => {
-        console.log(Math.floor(i/50),(i%50),"Clicked");
-    }
-
+    
     return(
-        <>
-            
-            <Box flexWrap="wrap" style={{width: "1000px"}}>
+        <>    
+            <Box flexWrap="wrap" style={{width: "400px"}}>
             {
-                squares.map((value,key) => (
-                    <Square key={key} clicked={() => handleClickSquare(key)}></Square>
+                board.map((value,key) => (
+                    <Square key={key} value={value} clicked={() => handleClickSquare(key)}></Square>
                 ))
             }
             </Box>
