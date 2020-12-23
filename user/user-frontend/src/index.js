@@ -12,8 +12,8 @@ ReactDOM.render(
     <BrowserRouter>
       <Route exact path="/" component={Login} ></Route>
       <Route exact path="/register" component={Register} ></Route>
-      <ProtectedRoute path="/hall" component={Hall}></ProtectedRoute>
-      <ProtectedRoute path="/game/:id" component={Game}></ProtectedRoute>
+      <Route path="/hall" component={Hall}></Route>
+      <Route path="/game/:id" component={Game}></Route>
 
 
     </BrowserRouter>
@@ -24,3 +24,26 @@ ReactDOM.render(
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+
+
+/*
+// Renderer callback with condition
+const renderer = ({ hours, minutes, seconds, completed }) => {
+  if (completed) {
+    // Render a completed state
+    return <Completionist />;
+  } else {
+    // Render a countdown
+    return <span>{seconds}</span>;
+  }
+};
+
+ReactDOM.render(
+  <Countdown date={Date.now() + 30000} renderer={renderer} />,
+  document.getElementById("root")
+);
+
+
+
+
+*/

@@ -11,3 +11,9 @@ module.exports.checkGameId = async (req,res,next) => {
     const isExist = await gameService.checkGameId(idGame);
     res.json(isExist);
 }
+
+module.exports.getAllGames = async(req,res,next) => {
+    console.log("hahahahahahaha");
+    const games = await gameService.getAllGames();
+    res.json(games);
+}

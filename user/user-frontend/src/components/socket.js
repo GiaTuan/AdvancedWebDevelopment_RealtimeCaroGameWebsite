@@ -31,19 +31,47 @@ export const sendText = (idGame,idUser,text) => {
     socket.emit("chat",{idGame: idGame, idUser: idUser, text: text});
 }
 
+
+export const playGame = (idGame,idUser) => {
+    socket.emit("play-game",{idGame:idGame,idUser: idUser})
+}
+
+export const getPlayers = (cb) => {
+    socket.on("play-game", data => {
+        return cb(data.players);
+    })
+}
+
+
 export const sendPosition = (idGame,idUser, row, col) => {
-    socket.emit("play-game", {idGame:idGame,idUser: idUser ,row: row, col: col})
+    socket.emit("send-position", {idGame:idGame,idUser: idUser ,row: row, col: col})
 }
 
 export const getBoard = (cb) => {
     socket.on("board-respond", data=> {
+        console.log(data);
         return cb(data)
     })
 }
 
-export const getText = (cb)=>{
+export const getChatHistory = (cb) => {
     socket.on("chat", data => {
         return cb(data);
     })
 }
+
+export const matchRandom = (idUser) => {
+    socket.emit("match-random", {idUser: idUser});
+}
+
+export const getMatchRandomResult = (cb) => {
+    socket.on("match-random", data => {
+        return cb(data);
+    })
+}
+
+export const cancelMatchRandom = (idUser) => {
+    socket.emit("cancel-match-random", {idUser: idUser});
+}
+
 

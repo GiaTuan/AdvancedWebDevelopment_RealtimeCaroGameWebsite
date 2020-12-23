@@ -28,8 +28,6 @@ passport.use(new JwtStrategy(JWTOptions , function(jwt_payload, done) {
 }));
 
 
-
-
 module.exports = passport;
 
 

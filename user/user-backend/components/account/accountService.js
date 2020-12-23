@@ -31,6 +31,7 @@ module.exports.authenAccount = async (username,password) => {
 
 module.exports.getUserFromId = async (userId) => {
     const user = await db.account.findAll({
+        attributes: ['id','email','name','phone','isadmin'],
         where: {
             id: userId
         }

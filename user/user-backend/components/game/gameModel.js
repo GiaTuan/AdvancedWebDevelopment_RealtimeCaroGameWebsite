@@ -6,8 +6,11 @@ module.exports = (sequelize,Sequelize) => {
             autoIncrement: true,
             primaryKey: true
         },
-        state: {
-            type: Sequelize.STRING,    
+        boards: {
+            type: Sequelize.ARRAY(Sequelize.TEXT),
+        },
+        isdone: {
+            type: Sequelize.BOOLEAN,    
         }
     })
     return Game;

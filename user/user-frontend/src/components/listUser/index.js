@@ -1,58 +1,77 @@
-import { Grid, GridList, GridListTile, makeStyles, Typography } from '@material-ui/core';
+import { Box, Grid, makeStyles, Tooltip, Typography} from '@material-ui/core';
+import DetailsIcon from '@material-ui/icons/Details';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
-import React, { useState,useEffect } from 'react';
-import URL from '../url'; 
-
+import React, { useState } from 'react';
 
 const useStyles = makeStyles({
     userContainer: {
         boxShadow: '0px 3px 3px -2px rgba(0,0,0,0.2), 0px 3px 4px 0px rgba(0,0,0,0.14), 0px 1px 8px 0px rgba(0,0,0,0.12)',
-        height : '100vh'
     },
     stateUserIcon:{
         fontSize: '12px'
+    },
+    DetailUserIcon:{
+        fontSize: '20px',
+        float: 'right',
+        '&:hover': {
+            boxShadow: '0px 3px 3px -2px rgba(0,0,0,0.2), 0px 3px 4px 0px rgba(0,0,0,0.14), 0px 1px 8px 0px rgba(0,0,0,0.12)',
+        }
     },
     stateUserIconColorOnline:{
         color: '#00d700'
     },
     stateUserIconColorOffline:{
         color: '#bcbcbc'
+    },
+    userBox: {
+        height: '500px',
+        overflow: 'scroll',
+        overflowX: 'hidden'
     }
 });
 
-export default function ListUser({usersOnline})
+export default function ListUser({users,usersOnline})
 {
-    const [users, setUsers] = useState([]);
-    useEffect(() => {
-        const getAllUsers = async () => {
-            const users = await fetch(URL.getUrl()+"users",{
-                method: 'GET',
-                mode: 'cors',
-                headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'}
-            })
-            const data = await users.json();
-            setUsers(data);
-        }
-        getAllUsers();
-    },[]);
-
+    const [open,setOpen] = useState(false);
     const classes = useStyles();
+
+    const handleShow = () => {
+        setOpen(true);
+    }
+
+    const handleClose = () => {
+        setOpen(false);
+    }
     return (
         <Grid container direction="column" className={classes.userContainer}>
-            <Typography>LIST OF USERS</Typography>
-            {
-                users.map((u,key) => (
-                    Object.values(usersOnline).indexOf(u.id) >= 0 ?
+            <Box cellHeight={200}  className={classes.userBox} p={2}>
+                <Typography variant="h5">LIST OF USERS</Typography>
+                {users.map((value,key) => (
+                    Object.values(usersOnline).indexOf(value.id) >= 0 ?
                         <Grid item key={key} >
-                            <Typography><FiberManualRecordIcon className={[classes.stateUserIconColorOnline,classes.stateUserIcon].join(" ")}></FiberManualRecordIcon>{u.name}</Typography>
+                            <Typography>
+                                <FiberManualRecordIcon className={[classes.stateUserIconColorOnline,classes.stateUserIcon].join(" ")}/>
+                                &nbsp;&nbsp;{value.id} - <b>{value.name}</b>
+                                <Tooltip title="Detail User" aria-label="add">
+                                    <DetailsIcon onClick={handleShow} className={classes.DetailUserIcon}></DetailsIcon>
+                                </Tooltip>
+                            </Typography>
+                            <hr></hr>
                         </Grid>
-                   : 
+                        : 
                         <Grid item key={key} >
-                            <Typography><FiberManualRecordIcon className={[classes.stateUserIconColorOffline,classes.stateUserIcon].join(" ")}></FiberManualRecordIcon>{u.name}</Typography>
+                            <Typography>
+                                <FiberManualRecordIcon className={[classes.stateUserIconColorOffline,classes.stateUserIcon].join(" ")}/>
+                                &nbsp;&nbsp;{value.id} - <b>{value.name}</b>
+                                <Tooltip title="Detail User" aria-label="add">
+                                    <DetailsIcon  onClick={handleShow} className={classes.DetailUserIcon}></DetailsIcon>
+                                </Tooltip>
+                            </Typography>
+                            <hr></hr>
                         </Grid>
                 ))}
+
+            </Box>
         </Grid>
         
     );

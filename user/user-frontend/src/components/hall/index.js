@@ -4,22 +4,66 @@ import React , {useState,useEffect} from 'react';
 import ListUser from '../listUser';
 import {initializeSocket,getUsetsOnline} from '../socket';
 import URL from '../url';
-import {joinGame,startGame} from '../socket';
+import {joinGame, matchRandom, cancelMatchRandom, getMatchRandomResult} from '../socket';
+import ListGames from '../listGames';
 
 export default function Hall(props){
 
+    const [users, setUsers] = useState([]);
     const [usersOnline,setUsersOnline] = useState([]);
-    const [open, setOpen] = useState(false)
+    const [games,setGames] = useState([]);
+    const [open, setOpen] = useState(false);
+    const [isMatchOption,setIsMatchOption] = useState(false);
     const [idGame,setIdGame] = useState(0);
     const [message,setMessage] = useState('');
-    const location = useLocation();
     const history = useHistory();
-
-    useEffect(() => {
-        initializeSocket(location.state.idUser);
-    },[location.state.idUser]);
+    const location = useLocation();
 
     useEffect(()=>{
+        const verifyUser = async () => {
+            const response = await fetch(URL.getUrl()+"users/verify",{
+                method: 'GET',
+                mode: 'cors',
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }});
+
+            if(response.status === 401)
+            {
+                history.push('/');
+            }
+        }
+
+        const getAllUsers = async () => {
+            const responds = await fetch(URL.getUrl()+"users",{
+                method: 'GET',
+                mode: 'cors',
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+            const data = await responds.json();
+            setUsers(data);
+        }
+
+        const getAllGames = async () => {
+            const respond = await fetch(URL.getUrl() + "game/all", {
+                method: 'GET',
+                mode: 'cors',
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+            const data = await respond.json();
+            setGames(data);
+        }
+
         getUsetsOnline(users => {
             let newUsersOnlineArray =[];
             for(const user in users)
@@ -28,7 +72,27 @@ export default function Hall(props){
             }
             setUsersOnline(newUsersOnlineArray);
         });
+
+        getMatchRandomResult(data => {
+            const idGameString = data.idGame.toString()
+            joinGame(idGameString,location.state.idUser,(data)=>{
+                if(data.success === true){
+                    history.push({
+                        pathname: '/game/'+idGameString,
+                        state: {idUser: location.state.idUser}});
+                }
+            });  
+        })
+
+        verifyUser();
+        getAllUsers();
+        getAllGames();
+
     },[])
+
+    useEffect(() => {
+            initializeSocket(location.state?.idUser);
+    },[]);
 
     const handleJoinNewGameClick = () => {
         setOpen(true);
@@ -44,10 +108,10 @@ export default function Hall(props){
 
         const response = await fetch(URL.getUrl()+"game",{
             method: 'GET',
-            mode: 'cors',
             headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
         }});
 
         const dataRespond = await response.json();
@@ -73,7 +137,6 @@ export default function Hall(props){
        
         const response = await fetch(URL.getUrl()+"game/check",{
             method: 'POST',
-            mode: 'cors',
             headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -81,6 +144,7 @@ export default function Hall(props){
             body: JSON.stringify({
                 idGame: idGame
             })});
+            
         const data = await response.json();
         if(data === true)
         {
@@ -100,13 +164,40 @@ export default function Hall(props){
         }
     }
 
+    const handleJoin = (id) => {
+        const idGame = id.toString();
+        
+        joinGame(idGame,location.state.idUser,(data)=>{
+            if(data.success === true){
+                history.push({
+                    pathname: '/game/'+idGame,
+                    state: {idUser: location.state.idUser}});
+            }
+        });
+    }
+
+    const handleClickMatchRandom = () => {
+        setIsMatchOption(true);
+        matchRandom(location.state.idUser);
+
+    }
+    const handleClickCancelMatchRandom = () => {
+        setIsMatchOption(false);
+        cancelMatchRandom(location.state.idUser);
+    }
+
     return (
         <Box m={3}>
             <Grid container spacing={2}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Box display="flex" justifyContent="flex-end">
-                        <form onSubmit={handleNewGameClick}><Button type="submit">New Game</Button></form>
-                        <Button onClick={handleJoinNewGameClick}>Join Game</Button>
+                        {
+                            isMatchOption === false ? 
+                            <Button  color="primary" onClick={handleClickMatchRandom}>Match Random</Button>
+                            :
+                            <Button  color="secondary" onClick={handleClickCancelMatchRandom}>Cancel Match Random</Button>
+                        }
+                        <Button onClick={handleJoinNewGameClick} variant="outlined" color="primary">Join Game</Button>
                         <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">                           
                             <DialogTitle id="form-dialog-title">Join Game</DialogTitle>
                             <form onSubmit={handleJoinGameSubmit}>
@@ -132,13 +223,14 @@ export default function Hall(props){
                                 </DialogActions>
                             </form>
                         </Dialog>
+                        <Button variant="contained" color="primary" onClick={handleNewGameClick}>New Game</Button>
                     </Box>
                 </Grid>
-                <Grid item lg={3} xs={3} sm={3} md={3}>
-                    <ListUser usersOnline={usersOnline}></ListUser>
+                <Grid item lg={3} md={3} sm={4} xs={12}>
+                    <ListUser users={users} usersOnline={usersOnline}></ListUser>
                 </Grid>
-                <Grid item lg={9}>
-                    Chat container
+                <Grid item lg={9} md={9} sm={8} xs={12}>
+                    <ListGames games={games} handleJoin={handleJoin}></ListGames>
                 </Grid>
             </Grid> 
         </Box>

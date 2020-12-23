@@ -12,8 +12,9 @@ const socketIO = require('socket.io');
 const { use } = require('passport');
 const gameService = require('../components/game/gameService');
 const chatService = require('../components/chat/chatService');
-const { chat } = require('../connection');
+const accountService = require('../components/account/accountService');
 const checkWin = require('../services/checkWin');
+const { match } = require('assert');
 
 /**
  * Get port from environment and store in Express.
@@ -55,13 +56,14 @@ const deleteChat = async(idGame) => {
 
 const users = {};
 const rooms ={};
+const matchRandomList = [];
 
 io.on("connection", (socket) => {
   socket.on("connect-to-server", userId=>{
     users[socket.id] = userId;
     socket.emit("online",users);
     socket.broadcast.emit("online",users);
-  })
+  });
 
   // socket.on("start", data => {
 
@@ -93,18 +95,18 @@ io.on("connection", (socket) => {
 
 
   socket.on("join", data => {
-    const room = io.sockets.adapter.rooms.get(data.idGame);
-    let size = 0;
-    if(room !== undefined)
-    {
-      size = room.size;
-    }
-    if(size === 2)
-    {
-      socket.emit("join-respond", {success: false});
-    }
-    else 
-    {
+    // const room = io.sockets.adapter.rooms.get(data.idGame);
+    // let size = 0;
+    // if(room !== undefined)
+    // {
+    //   size = room.size;
+    // }
+    // if(size === 2)
+    // {
+    //   socket.emit("join-respond", {success: false});
+    // }
+    // else 
+    // {
       if(!Object.keys(rooms).includes(data.idGame))
       {
         const blankBoard = new Array(20).fill(null);
@@ -117,7 +119,7 @@ io.on("connection", (socket) => {
           board: [...blankBoard],
           currentTurn: 0,
           players: [],
-          winner: 0,
+          winner: {},
           history: []
         }
       }
@@ -137,10 +139,12 @@ io.on("connection", (socket) => {
       {
         board = board.concat(rooms[data.idGame].board[i]);
       }
-      io.to(data.idGame).emit("board-respond",{board: board});
-    }
+      io.to(data.idGame).emit("board-respond",{board: board, history: rooms[data.idGame].history, winner: rooms[data.idGame].winner});
+      io.to(data.idGame).emit("chat",rooms[data.idGame].chat);
+      io.to(data.idGame).emit("play-game", {players : rooms[data.idGame].players});
+      //}
 
-  })
+  });
 
   socket.on("leave",  (data) => {
     socket.leave(data.idGame);
@@ -151,68 +155,60 @@ io.on("connection", (socket) => {
       //await deleteChat(data.idGame);
       delete rooms[data.idGame];
     }
-  })
+  });
 
-  socket.on("chat",  (data)=>{
+  socket.on("chat",  async (data)=>{
     //await addChat(data.idGame,data.idUser,data.text);
     //const chatHistory = await getChat(data.idGame);
 
-    const id = data.idUser;
-    const text = data.text;
-    const obj ={};
-    obj[id] = text;
+    const user = await accountService.getUserFromId(data.idUser);
+
+    const obj = {
+      content: data.text,
+      user: user
+    }
 
     rooms[data.idGame].chat = [...rooms[data.idGame].chat,obj];
 
-    console.log(rooms[data.idGame].chat);
-
     io.to(data.idGame).emit("chat",rooms[data.idGame].chat);
-  })
+  });
 
-  // socket.on("get-board",data=>{
-  //   io.to(data.idGame).emit("get-board-respond",{board: rooms[data.idGame].board});
-  // });
-
-  socket.on("play-game",data=>{
-    console.log(data);
-    if(rooms[data.idGame].winner !== 0) return;
-
+  socket.on("play-game", async (data) => {
     if(rooms[data.idGame].players.length < 2)
     {
-      if(!rooms[data.idGame].players.includes(data.idUser))
+      if(!rooms[data.idGame].players.some(obj => obj.id === data.idUser))
       {
-        rooms[data.idGame].players = [...rooms[data.idGame].players,data.idUser];
+        const user = await accountService.getUserFromId(data.idUser);
+        rooms[data.idGame].players = [...rooms[data.idGame].players,user];
       }
+      io.to(data.idGame).emit("play-game", {players : rooms[data.idGame].players});
     }
+  });
 
-    if(rooms[data.idGame].currentTurn === data.idUser)
-    {
-      return;
-    }
+  socket.on("send-position", async (data)=>{
+
+    if(!rooms[data.idGame].players.some(obj => obj.id === data.idUser)) return;
+
+    if(Object.keys(rooms[data.idGame].winner).length !== 0) return;
+
+    if(rooms[data.idGame].currentTurn === data.idUser) return;
+
+    if(rooms[data.idGame].board[data.row][data.col] !== null) return;
 
     rooms[data.idGame].currentTurn = data.idUser;
-
-
-    if(rooms[data.idGame].board[data.row][data.col] !== null)
-    {
-      return;
-    }
-
 
     //add history
     rooms[data.idGame].history = [...rooms[data.idGame].history,data]
 
     //add X O to square
-    rooms[data.idGame].board[data.row][data.col] = rooms[data.idGame].players[0] === data.idUser ? 'X' : 'O';
+    rooms[data.idGame].board[data.row][data.col] = rooms[data.idGame].players[0].id === data.idUser ? 'X' : 'O';
 
     //check win
     const check = checkWin(rooms[data.idGame].board,data.row,data.col);
 
-    let winner = 0;
     if(check)
     {
-      rooms[data.idGame].winner = data.idUser;
-      winner = data.idUser;
+      rooms[data.idGame].winner = await accountService.getUserFromId(data.idUser);
     }
 
     //convert to 1d array to send back to ui
@@ -222,21 +218,36 @@ io.on("connection", (socket) => {
       board = board.concat(rooms[data.idGame].board[i]);
     }
 
-    console.log(board);
+    //save to db
 
 
     //send data to ui
-    io.to(data.idGame).emit("board-respond",{board: board, history: rooms[data.idGame].history, winner: winner});
+    io.to(data.idGame).emit("board-respond",{board: board, history: rooms[data.idGame].history, winner: rooms[data.idGame].winner});
+  });
+
+  socket.on("match-random", async (data) => {
+    matchRandomList.push(socket.id);
+    while(matchRandomList.length > 1)
+    {
+      if(matchRandomList[0] !== undefined && matchRandomList[1] !== undefined)
+      {
+        const game = await gameService.getNewGame();
+        io.to(matchRandomList[0]).to(matchRandomList[1]).emit("match-random", {idGame: game.id});
+        matchRandomList.pop();
+        matchRandomList.pop();
+      }
+    }
   })
 
-  socket.on("demo",data=>{
-    console.log(data);
+  socket.on("cancel-match-random", async (data) => {
+    const index = matchRandomList.indexOf(socket.id);
+    matchRandomList.splice(index,1);
   })
 
   socket.on("disconnect", () => {
     delete users[socket.id];
     socket.broadcast.emit("online",users);
-  })
+  });
 })
 /**
  * Listen on provided port, on all network interfaces.

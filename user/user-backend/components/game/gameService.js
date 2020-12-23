@@ -34,3 +34,8 @@ module.exports.addDataToGameUser = async(idUser,idGame) => {
     // console.log(result)
     // console.log(JSON.stringify(result));
 }
+
+module.exports.getAllGames = async () => {
+    const result = await db.game.findAll();
+    return result;
+}
