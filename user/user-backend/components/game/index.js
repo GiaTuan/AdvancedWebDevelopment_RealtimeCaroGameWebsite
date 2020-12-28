@@ -4,11 +4,18 @@ const gameController = require('./gameController');
 const passport = require('../../passport');
 
 
-router.get('/', passport.authenticate('jwt', { session: false }), gameController.getNewGame);
+router.get('/', passport.authenticate('jwt', { session: false }), gameController.getAllGames);
 
-router.post('/check',  gameController.checkGameId);
+router.get('/add', passport.authenticate('jwt', { session: false }), gameController.getNewGame);
 
-router.get('/all', gameController.getAllGames);
+router.get('/:id', passport.authenticate('jwt', { session: false }), gameController.getGameById);
 
+router.get('/:id/chat', passport.authenticate('jwt', { session: false }), gameController.getChatByGameId);
+
+router.get('/:id/history', passport.authenticate('jwt', { session: false }), gameController.getHistoryByGameId);
+
+router.get('/:id/players', passport.authenticate('jwt', { session: false }), gameController.getPlayersByGameId);
+
+router.post('/check', passport.authenticate('jwt', { session: false }), gameController.checkGameId);
 
 module.exports = router;

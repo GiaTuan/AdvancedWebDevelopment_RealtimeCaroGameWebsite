@@ -1,5 +1,6 @@
+
 module.exports = (sequelize,Sequelize) => {
-    const GameUser = sequelize.define('GameUser',{
+    const GameHistory = sequelize.define('GameHistory',{
         id: {
             type: Sequelize.INTEGER,
             autoIncrement: true,
@@ -10,7 +11,13 @@ module.exports = (sequelize,Sequelize) => {
         },
         iduser: {
             type: Sequelize.INTEGER,    
+        },
+        row: {
+            type: Sequelize.INTEGER,    
+        },
+        col: {
+            type: Sequelize.INTEGER,    
         }
     })
-    return GameUser;
+    return GameHistory;
 };

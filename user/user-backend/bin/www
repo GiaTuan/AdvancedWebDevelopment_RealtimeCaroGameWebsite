@@ -14,7 +14,6 @@ const gameService = require('../components/game/gameService');
 const chatService = require('../components/chat/chatService');
 const accountService = require('../components/account/accountService');
 const checkWin = require('../services/checkWin');
-const { match } = require('assert');
 
 /**
  * Get port from environment and store in Express.
@@ -36,24 +35,6 @@ const io = socketIO(server,{
 });
 
 
-const addDataToGameUser  = async (idUser,idGame) => {
-  await gameService.addDataToGameUser(idUser,idGame);
-}
-
-const addChat = async(idGame,idUser,text) => {
-  await chatService.addChat(idGame,idUser,text);
-}
-
-const getChat = async(idGame) => {
-  const result = await chatService.getChat(idGame);
-  return result;
-}
-
-const deleteChat = async(idGame) => {
-  await chatService.deleteChat(idGame);
-}
-
-
 const users = {};
 const rooms ={};
 const matchRandomList = [];
@@ -65,102 +46,51 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("online",users);
   });
 
-  // socket.on("start", data => {
-
-  //   socket.join(data.idGame);
-
-  //   const blankBoard = new Array(20).fill(null);
-  //   for(let i = 0 ; i < 20 ; i++)
-  //   {
-  //     blankBoard[i] = new Array(20).fill(null);
-  //   }
-
-  //   rooms[data.idGame]= {
-  //     chat: [],
-  //     board: [...blankBoard],
-  //     currentTurn: 0,
-  //     players: [],
-  //     winner: 0,
-  //     history: []
-  //   }
-
-  //   let board = [];
-  //     for(let i = 0 ; i < rooms[data.idGame].board.length; i++)
-  //     {
-  //       board = board.concat(rooms[data.idGame].board[i]);
-  //     }
-      
-  //   io.to(data.idGame).emit("board-respond",{board: board});
-  // })
-
-
-  socket.on("join", data => {
-    // const room = io.sockets.adapter.rooms.get(data.idGame);
-    // let size = 0;
-    // if(room !== undefined)
-    // {
-    //   size = room.size;
-    // }
-    // if(size === 2)
-    // {
-    //   socket.emit("join-respond", {success: false});
-    // }
-    // else 
-    // {
-      if(!Object.keys(rooms).includes(data.idGame))
+  socket.on("join", async (data) => {
+    if(!Object.keys(rooms).includes(data.idGame))
+    {
+      const blankBoard = new Array(20).fill(null);
+      for(let i = 0 ; i < 20 ; i++)
       {
-        const blankBoard = new Array(20).fill(null);
-        for(let i = 0 ; i < 20 ; i++)
-        {
-          blankBoard[i] = new Array(20).fill(null);
-        }
-        rooms[data.idGame]= {
-          chat: [],
-          board: [...blankBoard],
-          currentTurn: 0,
-          players: [],
-          winner: {},
-          history: []
-        }
+        blankBoard[i] = new Array(20).fill(null);
       }
-      // else
-      // {
-      //   rooms[data.idGame].currentTurn = 'O';
-      // }
-      socket.join(data.idGame);
-      //addDataToGameUser(data.idUser,data.idGame);
-      //const turnOfPlayer = rooms[data.idGame].currentTurn;
-      //console.log(turnOfPlayer);
-      //socket.emit("join-respond", {success: true,turn: turnOfPlayer });
-      socket.emit("join-respond", {success: true});
 
-      let board = [];
-      for(let i = 0 ; i < rooms[data.idGame].board.length; i++)
-      {
-        board = board.concat(rooms[data.idGame].board[i]);
+      await gameService.addBoardToGame(data.idGame,new Array(400).fill(null));
+
+      rooms[data.idGame]= {
+        chat: [],
+        board: [...blankBoard],
+        currentTurn: 0,
+        players: [],
+        winner: {},
+        history: []
       }
-      io.to(data.idGame).emit("board-respond",{board: board, history: rooms[data.idGame].history, winner: rooms[data.idGame].winner});
-      io.to(data.idGame).emit("chat",rooms[data.idGame].chat);
-      io.to(data.idGame).emit("play-game", {players : rooms[data.idGame].players});
-      //}
+    }
+    socket.join(data.idGame);
+    socket.emit("join-respond", {success: true});
 
+    let board = [];
+    for(let i = 0 ; i < rooms[data.idGame].board.length; i++)
+    {
+      board = board.concat(rooms[data.idGame].board[i]);
+    }
+    io.to(data.idGame).emit("board-respond",{board: board, history: rooms[data.idGame].history, winner: rooms[data.idGame].winner});
+    io.to(data.idGame).emit("chat",rooms[data.idGame].chat);
+    io.to(data.idGame).emit("play-game", {players : rooms[data.idGame].players});
   });
 
-  socket.on("leave",  (data) => {
+  socket.on("leave", async (data) => {
     socket.leave(data.idGame);
 
     const room = io.sockets.adapter.rooms.get(data.idGame);
     if(room === undefined)
     {
-      //await deleteChat(data.idGame);
       delete rooms[data.idGame];
+      await gameService.setGameIsdone(data.idGame);
     }
   });
 
   socket.on("chat",  async (data)=>{
-    //await addChat(data.idGame,data.idUser,data.text);
-    //const chatHistory = await getChat(data.idGame);
-
     const user = await accountService.getUserFromId(data.idUser);
 
     const obj = {
@@ -169,6 +99,8 @@ io.on("connection", (socket) => {
     }
 
     rooms[data.idGame].chat = [...rooms[data.idGame].chat,obj];
+    
+    await chatService.addChat(data.idGame,data.idUser,data.text);
 
     io.to(data.idGame).emit("chat",rooms[data.idGame].chat);
   });
@@ -178,10 +110,16 @@ io.on("connection", (socket) => {
     {
       if(!rooms[data.idGame].players.some(obj => obj.id === data.idUser))
       {
+        await gameService.addGameUser(data.idGame,data.idUser);
+        await accountService.updateTotalPlaysByIdUser(data.idUser);
         const user = await accountService.getUserFromId(data.idUser);
         rooms[data.idGame].players = [...rooms[data.idGame].players,user];
       }
-      io.to(data.idGame).emit("play-game", {players : rooms[data.idGame].players});
+      io.to(data.idGame).emit("play-game", {players : rooms[data.idGame].players,success: true});
+    }
+    else
+    {
+      io.to(data.idGame).emit("play-game", {players : rooms[data.idGame].players,success: false});
     }
   });
 
@@ -209,9 +147,11 @@ io.on("connection", (socket) => {
     if(check)
     {
       rooms[data.idGame].winner = await accountService.getUserFromId(data.idUser);
+      await gameService.addWinner(data.idGame,data.idUser);
+      await accountService.updateTotalWinsByIdUser(data.idUser);
     }
 
-    //convert to 1d array to send back to ui
+    //convert to 1d array to send back to ui and save db
     let board = [];
     for(let i = 0 ; i < rooms[data.idGame].board.length; i++)
     {
@@ -219,7 +159,8 @@ io.on("connection", (socket) => {
     }
 
     //save to db
-
+    await gameService.addHistory(data.idUser,data.idGame,data.row,data.col);
+    await gameService.addBoardToGame(data.idGame,board);
 
     //send data to ui
     io.to(data.idGame).emit("board-respond",{board: board, history: rooms[data.idGame].history, winner: rooms[data.idGame].winner});

@@ -10,13 +10,30 @@ module.exports.addChat = async (idGame,idUser,text) => {
 }
 
 module.exports.getChat = async(idGame) => {
-    const result = await db.chat.findAll({
+    const data = await db.chat.findAll({
         where: {
             idgame: idGame
         },
+        include: [{
+            model: db.account, 
+            attributes: ['name'],
+            required: false
+        }]
     })
 
-    return result;
+    const chats = [];
+    for(let i = 0 ; i < data.length ; i++)
+    {
+        const obj = {
+            user: {
+                id: data[i].iduser,
+                name: data[i].Account.name
+            },
+            content: data[i].content
+        }
+        chats.push(obj);
+    }
+    return chats;
 }
 
 module.exports.deleteChat = async(idGame) => {

@@ -19,7 +19,10 @@ export default function BoardHistory({history})
 
             {
                 history.map((value,key) => (
-                <Typography key={key}><b>{value.idUser}</b>: ({value.row}:{value.col})</Typography>
+                    value.idUser !== undefined ? 
+                    <Typography key={key}><b>Player {value.idUser}</b>: clicked at row <b>{value.row}</b>, column <b>{value.col}</b></Typography>
+                    :
+                    <Typography key={key}><b>Player {value.iduser}</b>: clicked at row <b>{value.row}</b>, column <b>{value.col}</b></Typography>
                 ))
             }
         </Box>

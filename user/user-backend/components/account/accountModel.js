@@ -22,6 +22,18 @@ module.exports = (sequelize,Sequelize) => {
         phone:{
             type: Sequelize.STRING,
         },
+        totalplays: {
+            type: Sequelize.INTEGER,
+        },
+        totalwins: {
+            type: Sequelize.INTEGER,
+        },
+        point: {
+            type: Sequelize.INTEGER,
+        },
+        isblocked: {
+            type: Sequelize.BOOLEAN,
+        },
         isadmin:{
             type: Sequelize.BOOLEAN,
         },

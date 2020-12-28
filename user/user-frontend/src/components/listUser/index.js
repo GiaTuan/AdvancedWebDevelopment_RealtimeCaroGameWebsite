@@ -2,6 +2,7 @@ import { Box, Grid, makeStyles, Tooltip, Typography} from '@material-ui/core';
 import DetailsIcon from '@material-ui/icons/Details';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles({
     userContainer: {
@@ -30,18 +31,20 @@ const useStyles = makeStyles({
     }
 });
 
-export default function ListUser({users,usersOnline})
+export default function ListUser({myId,users,usersOnline})
 {
-    const [open,setOpen] = useState(false);
     const classes = useStyles();
+    const history = useHistory();
 
-    const handleShow = () => {
-        setOpen(true);
+    const handleClickUserDetail = (id) => {
+        history.push({
+            pathname: '/user/'+id,
+            state:{
+                idUser: id
+            }
+        });
     }
 
-    const handleClose = () => {
-        setOpen(false);
-    }
     return (
         <Grid container direction="column" className={classes.userContainer}>
             <Box cellHeight={200}  className={classes.userBox} p={2}>
@@ -52,8 +55,11 @@ export default function ListUser({users,usersOnline})
                             <Typography>
                                 <FiberManualRecordIcon className={[classes.stateUserIconColorOnline,classes.stateUserIcon].join(" ")}/>
                                 &nbsp;&nbsp;{value.id} - <b>{value.name}</b>
+                                {
+                                    myId === value.id ? <span>&nbsp;&#129409;</span> : null
+                                }
                                 <Tooltip title="Detail User" aria-label="add">
-                                    <DetailsIcon onClick={handleShow} className={classes.DetailUserIcon}></DetailsIcon>
+                                    <DetailsIcon onClick={() => handleClickUserDetail(value.id)} className={classes.DetailUserIcon}></DetailsIcon>
                                 </Tooltip>
                             </Typography>
                             <hr></hr>
@@ -64,13 +70,12 @@ export default function ListUser({users,usersOnline})
                                 <FiberManualRecordIcon className={[classes.stateUserIconColorOffline,classes.stateUserIcon].join(" ")}/>
                                 &nbsp;&nbsp;{value.id} - <b>{value.name}</b>
                                 <Tooltip title="Detail User" aria-label="add">
-                                    <DetailsIcon  onClick={handleShow} className={classes.DetailUserIcon}></DetailsIcon>
+                                    <DetailsIcon  onClick={() => handleClickUserDetail(value.id)} className={classes.DetailUserIcon}></DetailsIcon>
                                 </Tooltip>
                             </Typography>
                             <hr></hr>
                         </Grid>
                 ))}
-
             </Box>
         </Grid>
         

@@ -2,7 +2,6 @@ import { Button, CssBaseline, Grid, makeStyles, MuiThemeProvider, Paper, TextFie
 import React , {useState} from 'react';
 import {Link, useHistory} from 'react-router-dom';
 import URL from '../url';
-import Auth from '../protectedRoute/authentication'
 
 const useStyles = makeStyles({
     paperContainer: {

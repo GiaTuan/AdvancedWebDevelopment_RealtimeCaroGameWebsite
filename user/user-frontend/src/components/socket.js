@@ -38,7 +38,7 @@ export const playGame = (idGame,idUser) => {
 
 export const getPlayers = (cb) => {
     socket.on("play-game", data => {
-        return cb(data.players);
+        return cb(data);
     })
 }
 

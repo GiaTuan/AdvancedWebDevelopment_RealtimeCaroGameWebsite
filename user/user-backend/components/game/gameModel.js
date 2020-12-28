@@ -9,6 +9,10 @@ module.exports = (sequelize,Sequelize) => {
         boards: {
             type: Sequelize.ARRAY(Sequelize.TEXT),
         },
+        winner: {
+            type: Sequelize.INTEGER
+        }
+        ,
         isdone: {
             type: Sequelize.BOOLEAN,    
         }

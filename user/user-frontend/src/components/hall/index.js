@@ -1,5 +1,5 @@
 import { Box, Button, Dialog, DialogTitle, Grid, Typography,DialogContentText,DialogContent,DialogActions, TextField } from '@material-ui/core';
-import { useHistory, useLocation } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import React , {useState,useEffect} from 'react';
 import ListUser from '../listUser';
 import {initializeSocket,getUsetsOnline} from '../socket';
@@ -50,20 +50,6 @@ export default function Hall(props){
             setUsers(data);
         }
 
-        const getAllGames = async () => {
-            const respond = await fetch(URL.getUrl() + "game/all", {
-                method: 'GET',
-                mode: 'cors',
-                headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-                }
-            })
-            const data = await respond.json();
-            setGames(data);
-        }
-
         getUsetsOnline(users => {
             let newUsersOnlineArray =[];
             for(const user in users)
@@ -86,12 +72,27 @@ export default function Hall(props){
 
         verifyUser();
         getAllUsers();
-        getAllGames();
+    },[]);
 
-    },[])
+    useEffect(()=> {
+        const getAllGames = async () => {
+            const respond = await fetch(URL.getUrl() + "game", {
+                method: 'GET',
+                mode: 'cors',
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+            const data = await respond.json();
+            setGames(data);
+        }
+        getAllGames();
+    },[]); // deploy nhooooooooooooooooooooooooooooooooo bo []
 
     useEffect(() => {
-            initializeSocket(location.state?.idUser);
+        initializeSocket(location.state?.idUser);
     },[]);
 
     const handleJoinNewGameClick = () => {
@@ -106,7 +107,7 @@ export default function Hall(props){
     const handleNewGameClick = async (e) => {
         e.preventDefault();
 
-        const response = await fetch(URL.getUrl()+"game",{
+        const response = await fetch(URL.getUrl()+"game/add",{
             method: 'GET',
             headers: {
             'Accept': 'application/json',
@@ -131,15 +132,14 @@ export default function Hall(props){
         setIdGame(e.target.value);
     }
 
-    const handleJoinGameSubmit = async (e) => {
-        
+    const handleJoinGameSubmit = async (e) => {  
         e.preventDefault();
-       
         const response = await fetch(URL.getUrl()+"game/check",{
             method: 'POST',
             headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
             },
             body: JSON.stringify({
                 idGame: idGame
@@ -186,48 +186,70 @@ export default function Hall(props){
         cancelMatchRandom(location.state.idUser);
     }
 
+    const handleLogOut = () => {
+        localStorage.removeItem("token");
+        history.push("/");
+    }
+
     return (
         <Box m={3}>
             <Grid container spacing={2}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                    <Box display="flex" justifyContent="flex-end">
-                        {
-                            isMatchOption === false ? 
-                            <Button  color="primary" onClick={handleClickMatchRandom}>Match Random</Button>
-                            :
-                            <Button  color="secondary" onClick={handleClickCancelMatchRandom}>Cancel Match Random</Button>
-                        }
-                        <Button onClick={handleJoinNewGameClick} variant="outlined" color="primary">Join Game</Button>
-                        <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">                           
-                            <DialogTitle id="form-dialog-title">Join Game</DialogTitle>
-                            <form onSubmit={handleJoinGameSubmit}>
-                                <DialogContent>
-                                    <TextField
-                                        autoFocus
-                                        margin="dense"
-                                        id="name"
-                                        label="ID Game"
-                                        type="text"
-                                        fullWidth
-                                        onChange = {handleChangeIdGame}
-                                    />
-                                    <Typography>{message}</Typography>
-                                </DialogContent>
-                                <DialogActions>
-                                <Button onClick={handleClose} color="primary">
-                                    Cancel
-                                </Button>
-                                <Button color="primary" type="submit">
-                                    Join
-                                </Button>
-                                </DialogActions>
-                            </form>
-                        </Dialog>
-                        <Button variant="contained" color="primary" onClick={handleNewGameClick}>New Game</Button>
-                    </Box>
+                    <Grid container>
+                        <Grid item lg={6}>
+                            <Box>
+                                <Button onClick={handleLogOut}>Log out</Button>
+                                <Link to={{
+                                    pathname: "/history",
+                                    state: {
+                                        idUser: location.state?.idUser
+                                    }
+                                }}>
+                                    <Button>History</Button>
+                                </Link>
+                            </Box>
+                        </Grid>
+                        <Grid item lg={6}>
+                            <Box display="flex" justifyContent="flex-end">
+                                {
+                                    isMatchOption === false ? 
+                                    <Button  color="primary" onClick={handleClickMatchRandom}>Match Random</Button>
+                                    :
+                                    <Button  color="secondary" onClick={handleClickCancelMatchRandom}>Cancel Match Random</Button>
+                                }
+                                <Button onClick={handleJoinNewGameClick} variant="outlined" color="primary">Join Game</Button>
+                                <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">                           
+                                    <DialogTitle id="form-dialog-title">Join Game</DialogTitle>
+                                    <form onSubmit={handleJoinGameSubmit}>
+                                        <DialogContent>
+                                            <TextField
+                                                autoFocus
+                                                margin="dense"
+                                                id="name"
+                                                label="ID Game"
+                                                type="text"
+                                                fullWidth
+                                                onChange = {handleChangeIdGame}
+                                            />
+                                            <Typography>{message}</Typography>
+                                        </DialogContent>
+                                        <DialogActions>
+                                        <Button onClick={handleClose} color="primary">
+                                            Cancel
+                                        </Button>
+                                        <Button color="primary" type="submit">
+                                            Join
+                                        </Button>
+                                        </DialogActions>
+                                    </form>
+                                </Dialog>
+                                <Button variant="contained" color="primary" onClick={handleNewGameClick}>New Game</Button>
+                            </Box>
+                        </Grid>
+                    </Grid>
                 </Grid>
                 <Grid item lg={3} md={3} sm={4} xs={12}>
-                    <ListUser users={users} usersOnline={usersOnline}></ListUser>
+                    <ListUser myId={location.state?.idUser} users={users} usersOnline={usersOnline}></ListUser>
                 </Grid>
                 <Grid item lg={9} md={9} sm={8} xs={12}>
                     <ListGames games={games} handleJoin={handleJoin}></ListGames>

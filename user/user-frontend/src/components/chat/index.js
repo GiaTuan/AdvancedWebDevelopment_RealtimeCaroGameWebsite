@@ -12,7 +12,7 @@ const useStyles = makeStyles({
     }
 });
 
-export default function Chat({chatHistory,handleChangeText,handleSubmitChat}){
+export default function Chat({chatHistory,handleChangeText,handleSubmitChat,isDisableChat}){
     const classes = useStyles();
     return(
         <Box>
@@ -25,12 +25,17 @@ export default function Chat({chatHistory,handleChangeText,handleSubmitChat}){
                     ))
                 }
             </Box>
-            <Box mt={2}>
-                <form onSubmit={handleSubmitChat}>
-                    <TextField label="Text here" variant="outlined" onChange={handleChangeText} fullWidth multiline rowsMax={4}></TextField>
-                    <Button type="submit" variant="contained" color="primary">Submit</Button>
-                </form>
-            </Box>
+
+            {
+                isDisableChat ? 
+                null : 
+                <Box mt={2}>
+                    <form onSubmit={handleSubmitChat}>
+                        <TextField label="Text here" variant="outlined" onChange={handleChangeText} fullWidth multiline rowsMax={4}></TextField>
+                        <Button type="submit" variant="contained" color="primary">Submit</Button>
+                    </form>
+                </Box>
+            }
             
         </Box>);
 }

@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from '@material-ui/core';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Snackbar, TextField, Typography } from '@material-ui/core';
 import React, { useState,useEffect, useRef } from 'react';
 import {Link, useParams, useLocation, useHistory} from "react-router-dom";
 import {leaveGame,sendText,getChatHistory,sendPosition,getBoard,demo, playGame, getPlayers} from '../socket';
@@ -6,9 +6,11 @@ import Board from '../board';
 import Chat from '../chat';
 import BoardHistory from '../boardHistory';
 import URL from '../url';
-import io  from 'socket.io-client';
+import MuiAlert from '@material-ui/lab/Alert';
 
-
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 export default function Game(props){
 
@@ -19,6 +21,8 @@ export default function Game(props){
     const [boardHistory,setBoardHistory] = useState([]);
     const [winner,setWinner] = useState({});
     const [open,setOpen] = useState(false);
+    const [openMessage,setOpenMessage] = useState(false);
+    const [isPlaySuccess,setIsPlaySuccess] = useState(undefined);
     const history = useHistory();
     const location = useLocation();
     const { id } = useParams();
@@ -57,7 +61,17 @@ export default function Game(props){
         });
 
         getPlayers(data => {
-            setPlayers(data);
+            console.log(data);
+            if(data.success === true)
+            {
+                setIsPlaySuccess(true);
+            }
+            if(data.success === false)
+            {
+                setIsPlaySuccess(false);
+            }
+            setPlayers(data.players);
+            setOpenMessage(true);
         })
 
     },[]);
@@ -92,15 +106,23 @@ export default function Game(props){
         setOpen(false);
     }
 
+    const handleCloseAlert = (event, reason) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+        setOpenMessage(false);
+      };
+    
+
     return(
         <Box m={3}>
            <Grid container spacing={2}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
-                        <Link to={{
-                            pathname: "/hall",
-                            state: { idUser: location.state?.idUser}}}>
-                                <Button variant="outlined" color="primary" onClick={handleLeaveGame}>Return To Hall</Button>
-                        </Link>
+                    <Link to={{
+                        pathname: "/hall",
+                        state: { idUser: location.state?.idUser}}}>
+                            <Button variant="outlined" color="primary" onClick={handleLeaveGame}>Return To Hall</Button>
+                    </Link>
                 </Grid>
                 <Grid item lg={6} md={12} sm={12} xs ={12}>
                     <Grid container>
@@ -111,13 +133,26 @@ export default function Game(props){
                             <ol>
                                 {
                                     players.map((value,key) => (
-                                        <li key={key}>{value.id} - {value.name}</li>
+                                        <li key={key}>  &#9823; {value.id} - {value.name}</li>
                                     ))
                                 }
                             </ol>
                         </Grid>
                         <Grid item lg={3} md={3} sm={3} xs ={3}>
                             <Button variant="contained" color="primary" onClick={ () => handlePlayGame(id,location.state?.idUser)}>Play</Button>
+                            <Snackbar open={openMessage}>
+                            {
+                                isPlaySuccess ? 
+                                <Alert onClose={handleCloseAlert} severity="success">
+                                    Play game success
+                                </Alert>:
+                                isPlaySuccess === false ? 
+                                <Alert onClose={handleCloseAlert} severity="error">
+                                    Game is full
+                                </Alert> :
+                                <Alert severity="info" onClose={handleCloseAlert}>Welcome to Game</Alert>
+                            }
+                            </Snackbar>
                             <Button onClick={() => handleInviteBtnClick(id,location.state?.idUser)}>Invite</Button>
                             <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">                           
                             <DialogTitle id="form-dialog-title">Invite</DialogTitle>
@@ -130,7 +165,6 @@ export default function Game(props){
                                         label="ID Game"
                                         type="text"
                                         fullWidth
-                                        // onChange = {handleChangeIdGame}
                                     />
                                     <Typography>message</Typography>
                                 </DialogContent>
@@ -144,7 +178,7 @@ export default function Game(props){
                                 </DialogActions>
                             </form>
                         </Dialog>
-                            {Object.keys(winner).length !== 0 ? <Typography variant="h6">Winner: {winner.id} - {winner.name}</Typography> : null}
+                            {Object.keys(winner).length !== 0 ? <Typography variant="h6">Winner: &#9818; {winner.id} - {winner.name}</Typography> : null}
                         </Grid>
                     </Grid>
                     <Board board={board} handleClickSquare={handleClickSquare}></Board>

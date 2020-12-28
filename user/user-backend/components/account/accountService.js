@@ -9,7 +9,7 @@ module.exports.addAccount = async (username,password,name,email,phone) => {
         hashPassword = bcrypt.hashSync(password, salt);
     }
 
-    const id = await db.account.create({username: username,password: hashPassword,email: email, name: name, phone: phone, isadmin: false});
+    const id = await db.account.create({username: username,password: hashPassword,email: email, name: name, phone: phone, totalplays : 0, totalwins : 0, point : 0, isblocked : false, isadmin: false});
     return id;
 }
 
@@ -31,7 +31,7 @@ module.exports.authenAccount = async (username,password) => {
 
 module.exports.getUserFromId = async (userId) => {
     const user = await db.account.findAll({
-        attributes: ['id','email','name','phone','isadmin'],
+        attributes: ['id','email','name','phone','totalplays', 'totalwins' , 'point' , 'isblocked','isadmin'],
         where: {
             id: userId
         }
@@ -51,4 +51,50 @@ module.exports.getAllUsers = async () => {
         }
     });
     return users;
+}
+
+module.exports.getTotalPlaysByIdUser = async (idUser) => {
+    const user = await db.account.findAll({
+        attributes: ['totalplays'],
+        where: {
+            id: idUser
+        }
+    })
+    if(user.length > 0)
+    {
+       return user[0].totalplays;
+    }
+    return null;
+}
+
+module.exports.updateTotalPlaysByIdUser = async (idUser) => {
+    const totalPlays = await this.getTotalPlaysByIdUser(idUser);
+    const result = await db.account.update({totalplays: totalPlays + 1},{
+        where: {
+            id: idUser
+        }
+    })
+}
+
+module.exports.getTotalWinsByIdUser = async (idUser) => {
+    const user = await db.account.findAll({
+        attributes: ['totalwins'],
+        where: {
+            id: idUser
+        }
+    })
+    if(user.length > 0)
+    {
+       return user[0].totalwins;
+    }
+    return null;
+}
+
+module.exports.updateTotalWinsByIdUser = async (idUser) => {
+    const totalWins = await this.getTotalWinsByIdUser(idUser);
+    const result = await db.account.update({totalwins: totalWins + 1},{
+        where: {
+            id: idUser
+        }
+    })
 }

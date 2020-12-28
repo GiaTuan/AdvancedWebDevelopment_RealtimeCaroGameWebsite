@@ -3,9 +3,11 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter, Route } from 'react-router-dom';
 import Login from './components/login';
 import Register from './components/register';
-import ProtectedRoute from './components/protectedRoute';
 import Hall from './components/hall';
 import Game from './components/game';
+import History from './components/history';
+import GameDetail from './components/gameDetail';
+import UserDetail from './components/userDetail';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -13,9 +15,10 @@ ReactDOM.render(
       <Route exact path="/" component={Login} ></Route>
       <Route exact path="/register" component={Register} ></Route>
       <Route path="/hall" component={Hall}></Route>
+      <Route path="/history/:id" component={GameDetail} exact></Route>
+      <Route path="/history" component={History} exact></Route>
+      <Route path="/user/:id" component={UserDetail}></Route>
       <Route path="/game/:id" component={Game}></Route>
-
-
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
