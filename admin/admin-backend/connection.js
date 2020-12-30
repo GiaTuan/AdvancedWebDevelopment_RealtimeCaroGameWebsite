@@ -6,17 +6,76 @@ const sequelize = new Sequelize(process.env.DEV_DB_NAME, process.env.DEV_DB_USER
     define: {
         timestamps: false
     },
+  
     pool: {
-        max : 5,
-        min: 0,
-        idle: 10000
+      max: 5,
+      min: 0,
+      idle: 10000
     },
-});
+  });
 
-const db = {};
-db.Sequelize = Sequelize;
-db.sequelize = sequelize;
+  const db = {};
+  db.Sequelize = Sequelize;
+  db.sequelize = sequelize;
 
-db.account = require('./components/account/accountModel')(sequelize, Sequelize);
+  db.account = require('./components/account/accountModel')(sequelize,Sequelize);
+  db.game = require('./components/game/gameModel')(sequelize,Sequelize);
+//   db.gameHistory = require('./components/game/gameHistoryModel')(sequelize,Sequelize);
+  db.gameUser = require('./components/game/gameUserModel')(sequelize,Sequelize);
+//   db.chat = require('./components/chat/chatModel')(sequelize,Sequelize);
 
-module.exports = db;
+//   db.game.hasMany(db.gameHistory, {
+//     foreignKey: 'idgame'
+//   });
+//   db.gameHistory.belongsTo(db.game , {
+//     foreignKey: 'idgame'
+//   });
+//   db.account.hasMany(db.gameHistory, {
+//     foreignKey: 'iduser'
+//   });
+//   db.gameHistory.belongsTo(db.account , {
+//     foreignKey: 'iduser'
+//   });
+
+
+  db.account.hasMany(db.game, {
+    foreignKey: 'winner'
+  });
+  db.game.belongsTo(db.account , {
+    foreignKey: 'winner'
+  });
+
+
+  db.game.hasMany(db.gameUser, {
+    foreignKey: 'idgame'
+  });
+  db.gameUser.belongsTo(db.game , {
+    foreignKey: 'idgame'
+  });
+
+
+  db.account.hasMany(db.gameUser, {
+    foreignKey: 'iduser'
+  });
+  db.gameUser.belongsTo(db.account , {
+    foreignKey: 'iduser'
+  });
+
+
+//   db.game.hasMany(db.chat, {
+//     foreignKey: 'idgame'
+//   });
+//   db.chat.belongsTo(db.game , {
+//     foreignKey: 'idgame'
+//   });
+
+
+//   db.account.hasMany(db.chat, {
+//     foreignKey: 'iduser'
+//   });
+//   db.chat.belongsTo(db.account , {
+//     foreignKey: 'iduser'
+//   });
+
+  
+  module.exports = db;

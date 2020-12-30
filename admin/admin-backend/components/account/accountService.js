@@ -1,6 +1,44 @@
 const bcrypt = require('bcryptjs');
-const passport = require('passport');
 const db = require('../../connection');
+
+
+module.exports.getAll = async () => {
+    const result = db.account.findAll({
+        attributes: ["id","username","name","email","phone","isadmin","totalplays","totalwins","point","isblocked"],
+        order: [
+            'id'
+        ]
+    });
+    return result;
+}
+
+module.exports.getAccountById = async(id) => {
+    const result = db.account.findAll({
+        attributes: ["id","username","name","email","phone","isadmin","totalplays","totalwins","point","isblocked"],
+        where: {
+            id: id
+        }
+    });
+    return result;
+}
+
+module.exports.blockedUserById = async (id) => {
+    const result = db.account.update({isblocked: true},{
+        where: {
+            id: id
+        }
+    })
+    return result;
+}
+
+module.exports.unblockedUserById = async (id) => {
+    const result = db.account.update({isblocked: false},{
+        where: {
+            id: id
+        }
+    })
+    return result;
+}
 
 module.exports.addAcount = async (username, password, name, email, phone) => {
     let hashPassword;
@@ -27,4 +65,18 @@ module.exports.authenAccount = async (username, password) => {
 
     return ['Not found', null];
     
+}
+
+module.exports.getAllGamesByUserId = async (id) => {
+    const result = db.gameUser.findAll({
+        attributes: [["idgame","id"]],
+        where: {
+            iduser: id
+        },
+        include: [{
+            model: db.game,
+            attributes: [["winner","winner"]]
+        }]
+    })
+    return result;
 }

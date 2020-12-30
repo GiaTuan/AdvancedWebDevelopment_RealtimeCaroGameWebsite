@@ -2,7 +2,6 @@ import { Button, CssBaseline, Grid, makeStyles, MuiThemeProvider, Paper, TextFie
 import React , {useState} from 'react';
 import {Link, useHistory} from 'react-router-dom';
 import URL from '../url';
-import Auth from '../protectedRoute/authentication'
 
 const useStyles = makeStyles({
     paperContainer: {
@@ -48,7 +47,6 @@ export default function Login(props){
         e.preventDefault();
         const response = await fetch(URL.getUrl()+"login",{
             method: 'POST',
-            mode: 'cors',
             headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -57,13 +55,12 @@ export default function Login(props){
         username: loginData.username,
         password: loginData.password})});
 
-        if(response.ok)
+
+        if(response.status === 200)
         { 
             const data = await response.json();
             localStorage.setItem('token',data.token); 
-            Auth.logIn(() => {
-                props.history.push("/hall");
-            });               
+            history.push("/users");            
         }
         else setMessage("Username or password is not correct")
     }

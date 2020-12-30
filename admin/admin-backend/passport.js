@@ -11,7 +11,7 @@ passport.use(new LocalStrategy({session: false}, async (username, password, done
     const [status, user] = await accountService.authenAccount(username, password);
 
     if(status === 'Success')
-        done(null, {id: user.id, username: user.username});
+        done(null, {id: user.id, username: user.username, isadmin: user.isadmin});
     else
         done(null, false)
 }));
