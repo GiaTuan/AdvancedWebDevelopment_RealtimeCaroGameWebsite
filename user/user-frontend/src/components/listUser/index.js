@@ -28,7 +28,18 @@ const useStyles = makeStyles({
         height: '500px',
         overflow: 'scroll',
         overflowX: 'hidden'
-    }
+    },
+    first: {
+        border: '5px inset #dc0000',
+       
+    },
+    second: {
+        border: '5px groove #0000d8',
+    },
+    third: {
+        border: '5px solid #7b007b',
+    },
+   
 });
 
 export default function ListUser({myId,users,usersOnline})
@@ -40,7 +51,7 @@ export default function ListUser({myId,users,usersOnline})
         history.push({
             pathname: '/user/'+id,
             state:{
-                idUser: id
+                idUser: myId
             }
         });
     }
@@ -48,11 +59,11 @@ export default function ListUser({myId,users,usersOnline})
     return (
         <Grid container direction="column" className={classes.userContainer}>
             <Box cellHeight={200}  className={classes.userBox} p={2}>
-                <Typography variant="h5">LIST OF USERS</Typography>
+                <Typography variant="h6">HONORABLE PLAYERS LIST</Typography>
                 {users.map((value,key) => (
                     Object.values(usersOnline).indexOf(value.id) >= 0 ?
-                        <Grid item key={key} >
-                            <Typography>
+                        <Grid item key={key}>
+                            <Typography className={key === 0 ? classes.first : key === 1 ? classes.second : key === 2 ? classes.third : ''}>
                                 <FiberManualRecordIcon className={[classes.stateUserIconColorOnline,classes.stateUserIcon].join(" ")}/>
                                 &nbsp;&nbsp;{value.id} - <b>{value.name}</b>
                                 {
@@ -66,7 +77,7 @@ export default function ListUser({myId,users,usersOnline})
                         </Grid>
                         : 
                         <Grid item key={key} >
-                            <Typography>
+                            <Typography className={key === 0 ? classes.first : key === 1 ? classes.second : key === 2 ? classes.third : ''}>
                                 <FiberManualRecordIcon className={[classes.stateUserIconColorOffline,classes.stateUserIcon].join(" ")}/>
                                 &nbsp;&nbsp;{value.id} - <b>{value.name}</b>
                                 <Tooltip title="Detail User" aria-label="add">

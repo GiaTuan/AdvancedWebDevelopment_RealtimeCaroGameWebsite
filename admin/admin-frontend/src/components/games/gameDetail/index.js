@@ -4,6 +4,8 @@ import { Link, useHistory, useLocation, useParams } from 'react-router-dom';
 import Header from '../../header';
 import URL from '../../url';
 import Board from '../board';
+import Chat from '../chat';
+import BoardHistory from '../history';
 
 export default function GameDetail(props){
     const [game,setGame] = useState({});
@@ -84,14 +86,11 @@ export default function GameDetail(props){
 
         verifyUser();
         getGame();
-        // getChat();
-        // getBoardHistory();
-        // getGamePlayers();
+        getChat();
+        getBoardHistory();
+        getGamePlayers();
     },[])
 
-    const handleClickSquare = () => {
-
-    }
 
     return(
         <Box m={3}>
@@ -121,10 +120,10 @@ export default function GameDetail(props){
                     
                 </Grid>
                 <Grid item lg={3} md={5} sm={5} xs ={5}>
-                    {/* <BoardHistory history={boardHistory}></BoardHistory>  */}
+                    <BoardHistory history={boardHistory}></BoardHistory>
                 </Grid>
                 <Grid item lg={3} xs={7} sm={7} md={7}>
-                    {/* <Chat isDisableChat={true} chatHistory={chatHistory}></Chat> */}
+                    <Chat chatHistory={chatHistory}></Chat>
                 </Grid>
             </Grid>
         </Box>

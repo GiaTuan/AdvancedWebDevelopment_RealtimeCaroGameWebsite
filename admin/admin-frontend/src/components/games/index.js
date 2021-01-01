@@ -33,7 +33,6 @@ export default function Games(props){
                     'Authorization': 'Bearer ' + localStorage.getItem('token')
                 }});
             const data = await respond.json();
-            console.log(data);
             setGames(data);
         }
 

@@ -148,6 +148,7 @@ io.on("connection", (socket) => {
     {
       rooms[data.idGame].winner = await accountService.getUserFromId(data.idUser);
       await gameService.addWinner(data.idGame,data.idUser);
+      await accountService.updateWinner(data.idUser);
       await accountService.updateTotalWinsByIdUser(data.idUser);
     }
 

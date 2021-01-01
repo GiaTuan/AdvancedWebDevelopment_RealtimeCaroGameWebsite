@@ -20,22 +20,22 @@ const sequelize = new Sequelize(process.env.DEV_DB_NAME, process.env.DEV_DB_USER
 
   db.account = require('./components/account/accountModel')(sequelize,Sequelize);
   db.game = require('./components/game/gameModel')(sequelize,Sequelize);
-//   db.gameHistory = require('./components/game/gameHistoryModel')(sequelize,Sequelize);
+  db.gameHistory = require('./components/game/gameHistoryModel')(sequelize,Sequelize);
   db.gameUser = require('./components/game/gameUserModel')(sequelize,Sequelize);
-//   db.chat = require('./components/chat/chatModel')(sequelize,Sequelize);
+  db.chat = require('./components/chat/chatModel')(sequelize,Sequelize);
 
-//   db.game.hasMany(db.gameHistory, {
-//     foreignKey: 'idgame'
-//   });
-//   db.gameHistory.belongsTo(db.game , {
-//     foreignKey: 'idgame'
-//   });
-//   db.account.hasMany(db.gameHistory, {
-//     foreignKey: 'iduser'
-//   });
-//   db.gameHistory.belongsTo(db.account , {
-//     foreignKey: 'iduser'
-//   });
+  db.game.hasMany(db.gameHistory, {
+    foreignKey: 'idgame'
+  });
+  db.gameHistory.belongsTo(db.game , {
+    foreignKey: 'idgame'
+  });
+  db.account.hasMany(db.gameHistory, {
+    foreignKey: 'iduser'
+  });
+  db.gameHistory.belongsTo(db.account , {
+    foreignKey: 'iduser'
+  });
 
 
   db.account.hasMany(db.game, {
@@ -62,20 +62,20 @@ const sequelize = new Sequelize(process.env.DEV_DB_NAME, process.env.DEV_DB_USER
   });
 
 
-//   db.game.hasMany(db.chat, {
-//     foreignKey: 'idgame'
-//   });
-//   db.chat.belongsTo(db.game , {
-//     foreignKey: 'idgame'
-//   });
+  db.game.hasMany(db.chat, {
+    foreignKey: 'idgame'
+  });
+  db.chat.belongsTo(db.game , {
+    foreignKey: 'idgame'
+  });
 
 
-//   db.account.hasMany(db.chat, {
-//     foreignKey: 'iduser'
-//   });
-//   db.chat.belongsTo(db.account , {
-//     foreignKey: 'iduser'
-//   });
+  db.account.hasMany(db.chat, {
+    foreignKey: 'iduser'
+  });
+  db.chat.belongsTo(db.account , {
+    foreignKey: 'iduser'
+  });
 
   
   module.exports = db;

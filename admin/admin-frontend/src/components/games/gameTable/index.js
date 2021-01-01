@@ -28,7 +28,7 @@ export default function GameTable({games})
             <TableBody>
                 {
                     games.map((value,key)=>(
-                        <TableRow>
+                        <TableRow key={key}>
                             <TableCell>
                                 {value.id}
                             </TableCell>

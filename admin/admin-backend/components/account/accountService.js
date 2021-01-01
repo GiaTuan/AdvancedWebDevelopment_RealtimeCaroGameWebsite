@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const Sequelize = require('sequelize');
 const db = require('../../connection');
 
 
@@ -69,14 +70,15 @@ module.exports.authenAccount = async (username, password) => {
 
 module.exports.getAllGamesByUserId = async (id) => {
     const result = db.gameUser.findAll({
-        attributes: [["idgame","id"]],
+        attributes: [['idgame', 'id'],[Sequelize.col('Game.winner'), 'winner']],
         where: {
             iduser: id
         },
         include: [{
             model: db.game,
-            attributes: [["winner","winner"]]
-        }]
+            required: true
+        }],
+        order: ['idgame']
     })
     return result;
 }

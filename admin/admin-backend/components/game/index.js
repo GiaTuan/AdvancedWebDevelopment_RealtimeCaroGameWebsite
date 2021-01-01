@@ -7,10 +7,10 @@ router.get('/' , passport.authenticate('jwt', { session: false }), gameControlle
 
 router.get('/:id', passport.authenticate('jwt', { session: false }), gameController.getGameById);
 
-// router.get('/:id/chat', passport.authenticate('jwt', { session: false }), gameController.getChatByGameId);
+router.get('/:id/chat', passport.authenticate('jwt', { session: false }), gameController.getChatByGameId);
 
-// router.get('/:id/history', passport.authenticate('jwt', { session: false }), gameController.getHistoryByGameId);
+router.get('/:id/history', passport.authenticate('jwt', { session: false }), gameController.getHistoryByGameId);
 
-// router.get('/:id/players', passport.authenticate('jwt', { session: false }), gameController.getPlayersByGameId);
+router.get('/:id/players', passport.authenticate('jwt', { session: false }), gameController.getPlayersByGameId);
 
 module.exports = router;

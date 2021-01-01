@@ -48,7 +48,8 @@ module.exports.getAllUsers = async () => {
         attributes: ['id','username','name','email','phone'],
         where: {
             isadmin: false
-        }
+        },
+        order: [['point', 'DESC']]
     });
     return users;
 }
@@ -93,6 +94,31 @@ module.exports.getTotalWinsByIdUser = async (idUser) => {
 module.exports.updateTotalWinsByIdUser = async (idUser) => {
     const totalWins = await this.getTotalWinsByIdUser(idUser);
     const result = await db.account.update({totalwins: totalWins + 1},{
+        where: {
+            id: idUser
+        }
+    })
+}
+
+module.exports.getTotalPointsByIdUser = async (idUser) => {
+    const user = await db.account.findAll({
+        attributes: ['point'],
+        where: {
+            id: idUser
+        }
+    })
+    if(user.length > 0)
+    {
+       return user[0].point;
+    }
+    return null;
+}
+
+module.exports.updateWinner = async (idUser) => {
+    const totalWins = await this.getTotalWinsByIdUser(idUser);
+    const totalPlays = await this.getTotalPlaysByIdUser(idUser);
+    const totalPoints = await this.getTotalPointsByIdUser(idUser);
+    const result = await db.account.update({totalwins: totalWins + 1, totalPlays: totalPlays + 1, point: totalPoints + 10},{
         where: {
             id: idUser
         }
