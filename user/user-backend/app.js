@@ -4,15 +4,6 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
-/**
- * DEV_DB_NAME = 'WebDB'
-DEV_DB_USERNAME = 'postgres'
-DEV_DB_PASSWORD = 'Adgt123456'
-DEV_DB_HOST = 'localhost'
-JWT_SECRET = 'my-secrett'
-
- */
-
 
 
 const passport = require('./passport');

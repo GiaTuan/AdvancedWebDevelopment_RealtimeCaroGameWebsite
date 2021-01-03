@@ -6,7 +6,7 @@ import URL from '../url';
 export default function UserDetail(props){
     const [user,setUser] = useState({
         email: "",
-        id: 3,
+        id: 0,
         isadmin: false,
         isblocked: false,
         name: "",
@@ -49,7 +49,9 @@ export default function UserDetail(props){
 
         verifyUser();
         getUser();
-    })
+    },[]);
+
+
     return(
         <Box m={3}>
            <Grid container spacing={2}>
@@ -100,11 +102,22 @@ export default function UserDetail(props){
                             </Grid>
                             <Grid item>
                                 <Typography>
-                                    &#9818; Total wins: {user.totalwins} ({user.totalwins/user.totalplays*100}%)
+                                    &#9818; Total wins: {user.totalwins} ({(user.totalwins/user.totalplays*100).toFixed(3)}%)
                                 </Typography>
                             </Grid>
+                            <Grid item>
+                            {
+                                id === location.state?.idUser.toString() ? 
+                                <Link to={{
+                                pathname: "/user/"+location.state?.idUser +"/changePassword",
+                                state: {
+                                    idUser: location.state?.idUser
+                                }}} style={{textDecoration: 'none'}}>
+                                    <Button variant="contained" color="primary">Change Password</Button>
+                                </Link> : null
+                            }
+                            </Grid>
                         </Grid>
-
                     </Box>
                 </Grid>
             </Grid>

@@ -32,7 +32,7 @@ export default function Hall(props){
 
             if(response.status === 401)
             {
-                history.push('/');
+                props.history.push('/');
             }
         }
 
@@ -63,7 +63,7 @@ export default function Hall(props){
             const idGameString = data.idGame.toString()
             joinGame(idGameString,location.state.idUser,(data)=>{
                 if(data.success === true){
-                    history.push({
+                    props.history.push({
                         pathname: '/game/'+idGameString,
                         state: {idUser: location.state.idUser}});
                 }
@@ -121,7 +121,7 @@ export default function Hall(props){
 
         joinGame(idGame,location.state.idUser,(data)=>{
             if(data.success === true){
-                history.push({
+                props.history.push({
                     pathname: '/game/'+idGame,
                     state: {idUser: location.state.idUser}});
             }
@@ -150,12 +150,9 @@ export default function Hall(props){
         {
             joinGame(idGame,location.state.idUser,(data)=>{
                 if(data.success === true){
-                    history.push({
+                    props.history.push({
                         pathname: '/game/'+idGame,
                         state: {idUser: location.state.idUser}});
-                }
-                else{
-                    setMessage("Room is full");
                 }
             });
         }
@@ -169,7 +166,7 @@ export default function Hall(props){
         
         joinGame(idGame,location.state.idUser,(data)=>{
             if(data.success === true){
-                history.push({
+                props.history.push({
                     pathname: '/game/'+idGame,
                     state: {idUser: location.state.idUser}});
             }
@@ -188,7 +185,7 @@ export default function Hall(props){
 
     const handleLogOut = () => {
         localStorage.removeItem("token");
-        history.push("/");
+        props.history.push("/");
     }
 
     return (
@@ -196,21 +193,29 @@ export default function Hall(props){
             <Grid container spacing={2}>
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                     <Grid container>
-                        <Grid item lg={6}>
+                        <Grid item lg={6} md={6} sm={12}>
                             <Box>
-                                <Button onClick={handleLogOut}>Log out</Button>
+                                <Link to={{
+                                    pathname: "/user/"+location.state?.idUser,
+                                    state: {
+                                        idUser: location.state?.idUser
+                                    }}} style={{textDecoration: 'none'}}>
+                                    <Button variant="contained" color="primary">My Info</Button>
+                                </Link>
+
                                 <Link to={{
                                     pathname: "/history",
                                     state: {
                                         idUser: location.state?.idUser
                                     }
-                                }}>
-                                    <Button>History</Button>
+                                }} style={{textDecoration: 'none'}}>
+                                    <Button variant="outlined"  color="primary">History</Button>
                                 </Link>
+                                <Button color="primary" onClick={handleLogOut}>Log out</Button>
                             </Box>
                         </Grid>
-                        <Grid item lg={6}>
-                            <Box display="flex" justifyContent="flex-end">
+                        <Grid item lg={6} md={6} sm={12}>
+                            <Box display="flex" flexWrap="wrap" justifyContent="flex-end">
                                 {
                                     isMatchOption === false ? 
                                     <Button  color="primary" onClick={handleClickMatchRandom}>Match Random</Button>

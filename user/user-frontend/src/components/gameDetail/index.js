@@ -41,7 +41,6 @@ export default function GameDetail(props){
             }});
 
             const data = await respond.json();
-            console.log(data);
             setGame(data[0]);
         }
 
@@ -108,7 +107,7 @@ export default function GameDetail(props){
                 <Grid item lg={12} md={12} sm={12} xs={12}>
                     {
                         game !== undefined ? 
-                        <Typography variant = "h5">Winner: &#9818;{game.winner}</Typography> : null
+                        <Typography variant = "h5">Winner ID: &#9818;{game.winner}</Typography> : null
                     }
                     <Typography>Players: </Typography>
                     <ol>

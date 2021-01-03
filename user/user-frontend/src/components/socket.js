@@ -36,8 +36,14 @@ export const playGame = (idGame,idUser) => {
     socket.emit("play-game",{idGame:idGame,idUser: idUser})
 }
 
-export const getPlayers = (cb) => {
+export const playGameResponse = (cb) => {
     socket.on("play-game", data => {
+        return cb(data);
+    })
+}
+
+export const getPlayers = (cb) => {
+    socket.on("players",data=>{
         return cb(data);
     })
 }
@@ -49,7 +55,6 @@ export const sendPosition = (idGame,idUser, row, col) => {
 
 export const getBoard = (cb) => {
     socket.on("board-respond", data=> {
-        console.log(data);
         return cb(data)
     })
 }
@@ -72,6 +77,17 @@ export const getMatchRandomResult = (cb) => {
 
 export const cancelMatchRandom = (idUser) => {
     socket.emit("cancel-match-random", {idUser: idUser});
+}
+
+export const giveIn = (idGame,idUser) => {
+    socket.emit("give-in",{idGame: idGame, idUser: idUser});
+}
+
+export const giveInResponse = (cb) => {
+    socket.on("give-in", data => {
+        console.log(data);
+        return cb(data);
+    })
 }
 
 

@@ -8,17 +8,21 @@ import Game from './components/game';
 import History from './components/history';
 import GameDetail from './components/gameDetail';
 import UserDetail from './components/userDetail';
+import ForgetPassword from './components/forgetPassword';
+import ChangePassword from './components/changePassword';
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <Route exact path="/" component={Login} ></Route>
-      <Route exact path="/register" component={Register} ></Route>
-      <Route path="/hall" component={Hall}></Route>
+      <Route exact path="/" component={Login} exact></Route>
+      <Route exact path="/forgetPassword" component={ForgetPassword} exact></Route>
+      <Route exact path="/register" component={Register} exact></Route>
+      <Route path="/hall" component={Hall} exact></Route>
       <Route path="/history/:id" component={GameDetail} exact></Route>
       <Route path="/history" component={History} exact></Route>
-      <Route path="/user/:id" component={UserDetail}></Route>
-      <Route path="/game/:id" component={Game}></Route>
+      <Route path="/user/:id" component={UserDetail} exact></Route>
+      <Route path="/user/:id/changePassword" component={ChangePassword} exact></Route>
+      <Route path="/game/:id" component={Game} exact></Route>
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')

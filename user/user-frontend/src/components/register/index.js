@@ -38,6 +38,11 @@ export default function Register(props){
 
     const submitRegister = async (e) => {
         e.preventDefault();
+        if(registerData.username === '' || registerData.email === '' || registerData.password === '')
+        {
+            setMessage("Username or email or password is empty");
+            return;
+        }
         const response = await fetch(URL.getUrl()+"register",{
                 mode: 'cors',
                 method: 'POST',
@@ -53,18 +58,12 @@ export default function Register(props){
             phone: registerData.phone})});
             
         const data = await response.json()
-        if(data === 'username exist')
+        if(response.status === 403)
         {
-            setMessage('Username existed, please try another');
-            setIsSuccess(false);
+            setMessage(data);
         }
-        if(data === 'email exist')
-        {
-            setMessage('Email existed, please try another');
-            setIsSuccess(false);
 
-        }
-        if(data === 'success')
+        else
         {
             setIsSuccess(true);
             setMessage("Register successfully");
@@ -114,11 +113,11 @@ export default function Register(props){
                         <Paper elevation={3} className={classes.paperContainer}>
                             <Typography style={{textAlign: 'center'}}>Register</Typography>
                             <form onSubmit={submitRegister}>
-                                <TextField onChange={onChangeUsername} name="username" label="Username" fullWidth>
+                                <TextField onChange={onChangeUsername} name="username" label="*Username" fullWidth>
                                 </TextField>
-                                <TextField onChange={onChangePassword} name="password" label="Password" type="password" fullWidth>
+                                <TextField onChange={onChangePassword} name="password" label="*Password" type="password" fullWidth>
                                 </TextField>
-                                <TextField onChange={onChangeEmail} name="email" label="Email" type="text"  fullWidth>
+                                <TextField onChange={onChangeEmail} name="email" label="*Email" type="text"  fullWidth>
                                 </TextField>
                                 <TextField onChange={onChangeName} name="name" label="Name" type="text"  fullWidth>
                                 </TextField>

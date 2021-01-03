@@ -37,6 +37,9 @@ module.exports = (sequelize,Sequelize) => {
         isadmin:{
             type: Sequelize.BOOLEAN,
         },
+        isconfirmed:{
+            type: Sequelize.INTEGER,
+        },
     })
     return Account;
 };

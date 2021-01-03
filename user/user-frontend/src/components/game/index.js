@@ -1,7 +1,7 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Snackbar, TextField, Typography } from '@material-ui/core';
 import React, { useState,useEffect, useRef } from 'react';
 import {Link, useParams, useLocation, useHistory} from "react-router-dom";
-import {leaveGame,sendText,getChatHistory,sendPosition,getBoard,demo, playGame, getPlayers} from '../socket';
+import {leaveGame,sendText,getChatHistory,sendPosition,getBoard, playGame, playGameResponse,getPlayers,giveIn,giveInResponse} from '../socket';
 import Board from '../board';
 import Chat from '../chat';
 import BoardHistory from '../boardHistory';
@@ -20,9 +20,9 @@ export default function Game(props){
     const [players,setPlayers] = useState([]);
     const [boardHistory,setBoardHistory] = useState([]);
     const [winner,setWinner] = useState({});
-    const [open,setOpen] = useState(false);
     const [openMessage,setOpenMessage] = useState(false);
     const [isPlaySuccess,setIsPlaySuccess] = useState(undefined);
+    const [message,setMessage] = useState('');
     const history = useHistory();
     const location = useLocation();
     const { id } = useParams();
@@ -43,7 +43,9 @@ export default function Game(props){
             }
         }
         verifyUser();
+    },[]);
 
+    useEffect(()=>{
         getChatHistory(data => {
             setChatHistory(data);
         });
@@ -57,11 +59,10 @@ export default function Game(props){
             {
                 setBoardHistory(data.history);
             }
-            setBoard(data.board);
+            if(data.board !== undefined) setBoard(data.board);
         });
 
-        getPlayers(data => {
-            console.log(data);
+        playGameResponse(data => {
             if(data.success === true)
             {
                 setIsPlaySuccess(true);
@@ -70,10 +71,17 @@ export default function Game(props){
             {
                 setIsPlaySuccess(false);
             }
-            setPlayers(data.players);
             setOpenMessage(true);
         })
 
+        getPlayers(data=>{
+            setPlayers(data.players);
+        })
+
+        giveInResponse(data=>{
+            setMessage(data.message);
+            setWinner(data.winner);
+        })
     },[]);
 
     const handleLeaveGame = () => {
@@ -97,14 +105,10 @@ export default function Game(props){
         playGame(id,idUser)
     }
 
-    const handleInviteBtnClick = (idGame,idUser) => {
-        setOpen(true);
-        console.log(idGame,idUser)
+    const handleGiveIn = () => {
+        giveIn(id,location.state.idUser);
     }
 
-    const handleClose = () => {
-        setOpen(false);
-    }
 
     const handleCloseAlert = (event, reason) => {
         if (reason === 'clickaway') {
@@ -153,31 +157,8 @@ export default function Game(props){
                                 <Alert severity="info" onClose={handleCloseAlert}>Welcome to Game</Alert>
                             }
                             </Snackbar>
-                            <Button onClick={() => handleInviteBtnClick(id,location.state?.idUser)}>Invite</Button>
-                            <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">                           
-                            <DialogTitle id="form-dialog-title">Invite</DialogTitle>
-                            <form >
-                                <DialogContent>
-                                    <TextField
-                                        autoFocus
-                                        margin="dense"
-                                        id="name"
-                                        label="ID Game"
-                                        type="text"
-                                        fullWidth
-                                    />
-                                    <Typography>message</Typography>
-                                </DialogContent>
-                                <DialogActions>
-                                <Button onClick={handleClose} color="primary">
-                                    Cancel
-                                </Button>
-                                <Button color="primary" type="submit">
-                                    Join
-                                </Button>
-                                </DialogActions>
-                            </form>
-                        </Dialog>
+                            <Button onClick={handleGiveIn}>Give in</Button>
+                            <Typography>{message}</Typography>
                             {Object.keys(winner).length !== 0 ? <Typography variant="h6">Winner: &#9818; {winner.id} - {winner.name}</Typography> : null}
                         </Grid>
                     </Grid>

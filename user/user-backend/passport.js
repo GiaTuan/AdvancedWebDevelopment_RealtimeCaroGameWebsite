@@ -10,6 +10,14 @@ passport.use(new LocalStrategy({session: false}, async (username,password,done)=
     const [isSucess,user] = await accountService.authenAccount(username,password);
     if(isSucess)
     {
+        if(user === -1)
+        {
+            done(null,{isNotActivated : true});
+        }
+        if(user === 0)
+        {
+            done(null,{isBlocked : true})
+        }
         done(null,{ id: user.id, username: user.username });
     }
     else 

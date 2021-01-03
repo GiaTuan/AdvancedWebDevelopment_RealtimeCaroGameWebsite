@@ -76,7 +76,7 @@ io.on("connection", (socket) => {
     }
     io.to(data.idGame).emit("board-respond",{board: board, history: rooms[data.idGame].history, winner: rooms[data.idGame].winner});
     io.to(data.idGame).emit("chat",rooms[data.idGame].chat);
-    io.to(data.idGame).emit("play-game", {players : rooms[data.idGame].players});
+    io.to(data.idGame).emit("players", {players : rooms[data.idGame].players});
   });
 
   socket.on("leave", async (data) => {
@@ -115,11 +115,14 @@ io.on("connection", (socket) => {
         const user = await accountService.getUserFromId(data.idUser);
         rooms[data.idGame].players = [...rooms[data.idGame].players,user];
       }
-      io.to(data.idGame).emit("play-game", {players : rooms[data.idGame].players,success: true});
+      io.to(socket.id).emit("play-game", {success: true});
+      io.to(data.idGame).emit("players",{players : rooms[data.idGame].players});
     }
     else
     {
-      io.to(data.idGame).emit("play-game", {players : rooms[data.idGame].players,success: false});
+      io.to(socket.id).emit("play-game", {success: false});
+      io.to(data.idGame).emit("players",{players : rooms[data.idGame].players});
+
     }
   });
 
@@ -149,7 +152,6 @@ io.on("connection", (socket) => {
       rooms[data.idGame].winner = await accountService.getUserFromId(data.idUser);
       await gameService.addWinner(data.idGame,data.idUser);
       await accountService.updateWinner(data.idUser);
-      await accountService.updateTotalWinsByIdUser(data.idUser);
     }
 
     //convert to 1d array to send back to ui and save db
@@ -184,6 +186,14 @@ io.on("connection", (socket) => {
   socket.on("cancel-match-random", async (data) => {
     const index = matchRandomList.indexOf(socket.id);
     matchRandomList.splice(index,1);
+  })
+
+  socket.on("give-in", async(data)=>{
+    console.log(data);
+    rooms[data.idGame].winner = rooms[data.idGame].players[0].id === data.idUser ? data.idUserrooms[data.idGame].players[1] : rooms[data.idGame].players[0];
+    await gameService.addWinner(data.idGame,rooms[data.idGame].winner.id);
+      await accountService.updateWinner(rooms[data.idGame].winner.id);
+    io.to(data.idGame).emit("give-in",{message: 'User ID ' + data.idUser + ' gives in',winner: rooms[data.idGame].winner});
   })
 
   socket.on("disconnect", () => {

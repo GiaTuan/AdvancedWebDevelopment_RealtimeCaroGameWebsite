@@ -32,7 +32,8 @@ module.exports.getPlayersByGameId =  async (id) => {
 module.exports.checkGameId = async (id) => {
     const result = await db.game.findAll({
         where: {
-            id: id
+            id: id,
+            isdone: false
         }
     });
 
