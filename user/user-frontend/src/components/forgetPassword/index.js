@@ -1,8 +1,6 @@
-import { Box, Button, CssBaseline, Grid, makeStyles, MuiThemeProvider, Paper, TextField, Typography } from '@material-ui/core';
+import { Button, CssBaseline, Grid, makeStyles, MuiThemeProvider, Paper, TextField, Typography } from '@material-ui/core';
 import React , {useState} from 'react';
-import GoogleLogin from 'react-google-login';
-import FacebookLogin from 'react-facebook-login';
-import {Link, useHistory} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import URL from '../url';
 
 const useStyles = makeStyles({

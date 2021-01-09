@@ -1,6 +1,5 @@
 import { Box, Button, List, ListItem, ListItemText } from '@material-ui/core';
 import React from 'react';
-import { joinGame } from '../socket';
 
 export default function ListGames({games,handleJoin}){
     return (

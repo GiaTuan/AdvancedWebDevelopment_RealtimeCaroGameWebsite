@@ -30,7 +30,7 @@ export default function UserDetail(props){
 
             if(response.status === 401)
             {
-                history.push('/');
+                history.replace('/');
             }
         }
 

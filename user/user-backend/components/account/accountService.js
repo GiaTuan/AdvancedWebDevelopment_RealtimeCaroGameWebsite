@@ -111,7 +111,7 @@ module.exports.authenAccount = async (username,password) => {
             username: username
         }
     });
-    if(user !== undefined)
+    if(user !== null)
     {
         if(user.isconfirmed !== 1)
         {
@@ -214,13 +214,22 @@ module.exports.getTotalPointsByIdUser = async (idUser) => {
     return null;
 }
 
-module.exports.updateWinner = async (idUser) => {
-    const totalWins = await this.getTotalWinsByIdUser(idUser);
-    const totalPlays = await this.getTotalPlaysByIdUser(idUser);
-    const totalPoints = await this.getTotalPointsByIdUser(idUser);
-    const result = await db.account.update({totalwins: totalWins + 1, totalPlays: totalPlays + 1, point: totalPoints + 10},{
+module.exports.updateWinner = async (idWinner,idLoser) => {
+    console.log(idWinner,idLoser);
+    const winner = await this.getUserFromId(idWinner);
+    const loser = await this.getUserFromId(idLoser);
+
+    console.log(winner,loser);
+
+    const point = 10 + Math.round(Math.abs(winner.point - (winner.point - loser.point))/100);
+
+    const totalWins = await this.getTotalWinsByIdUser(idWinner);
+    const totalPlays = await this.getTotalPlaysByIdUser(idWinner);
+    const totalPoints = await this.getTotalPointsByIdUser(idWinner);
+
+    const result = await db.account.update({totalwins: totalWins + 1, totalPlays: totalPlays + 1, point: totalPoints + point},{
         where: {
-            id: idUser
+            id: idWinner
         }
     })
 }

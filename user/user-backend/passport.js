@@ -7,7 +7,9 @@ const JwtStrategy = passportJWT.Strategy;
 const accountService = require('./components/account/accountService');
 
 passport.use(new LocalStrategy({session: false}, async (username,password,done)=>{
+    console.log("DMMM");
     const [isSucess,user] = await accountService.authenAccount(username,password);
+    console.log("DMMM2");
     if(isSucess)
     {
         if(user === -1)

@@ -27,7 +27,7 @@ export default function GameDetail(props){
 
             if(response.status === 401)
             {
-                history.push('/');
+                history.replace('/');
             }
         }
 

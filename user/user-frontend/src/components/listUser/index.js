@@ -1,7 +1,7 @@
 import { Box, Grid, makeStyles, Tooltip, Typography} from '@material-ui/core';
 import DetailsIcon from '@material-ui/icons/Details';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
-import React, { useState } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles({
@@ -48,7 +48,7 @@ export default function ListUser({myId,users,usersOnline})
     const history = useHistory();
 
     const handleClickUserDetail = (id) => {
-        history.push({
+        history.replace({
             pathname: '/user/'+id,
             state:{
                 idUser: myId

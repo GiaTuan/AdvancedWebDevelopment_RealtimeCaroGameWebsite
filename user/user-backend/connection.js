@@ -30,6 +30,8 @@ const sequelize = new Sequelize(process.env.DEV_DB_NAME, process.env.DEV_DB_USER
   db.gameHistory.belongsTo(db.game , {
     foreignKey: 'idgame'
   });
+
+  
   db.account.hasMany(db.gameHistory, {
     foreignKey: 'iduser'
   });

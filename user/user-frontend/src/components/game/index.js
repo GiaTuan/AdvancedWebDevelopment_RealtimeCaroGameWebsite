@@ -1,5 +1,5 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Snackbar, TextField, Typography } from '@material-ui/core';
-import React, { useState,useEffect, useRef } from 'react';
+import { Box, Button,  Grid, Snackbar, Typography } from '@material-ui/core';
+import React, { useState,useEffect } from 'react';
 import {Link, useParams, useLocation, useHistory} from "react-router-dom";
 import {leaveGame,sendText,getChatHistory,sendPosition,getBoard, playGame, playGameResponse,getPlayers,giveIn,giveInResponse} from '../socket';
 import Board from '../board';
@@ -39,7 +39,7 @@ export default function Game(props){
 
             if(response.status === 401)
             {
-                history.push('/');
+                history.replace('/');
             }
         }
         verifyUser();
@@ -115,8 +115,7 @@ export default function Game(props){
           return;
         }
         setOpenMessage(false);
-      };
-    
+    }
 
     return(
         <Box m={3}>
@@ -157,7 +156,7 @@ export default function Game(props){
                                 <Alert severity="info" onClose={handleCloseAlert}>Welcome to Game</Alert>
                             }
                             </Snackbar>
-                            <Button onClick={handleGiveIn}>Give in</Button>
+                            <Button variant="outlined" color="primary" onClick={handleGiveIn}>Give in</Button>
                             <Typography>{message}</Typography>
                             {Object.keys(winner).length !== 0 ? <Typography variant="h6">Winner: &#9818; {winner.id} - {winner.name}</Typography> : null}
                         </Grid>

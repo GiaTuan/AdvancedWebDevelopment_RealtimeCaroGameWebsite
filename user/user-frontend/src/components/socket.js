@@ -85,7 +85,6 @@ export const giveIn = (idGame,idUser) => {
 
 export const giveInResponse = (cb) => {
     socket.on("give-in", data => {
-        console.log(data);
         return cb(data);
     })
 }

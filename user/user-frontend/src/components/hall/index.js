@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogTitle, Grid, Typography,DialogContentText,DialogContent,DialogActions, TextField } from '@material-ui/core';
+import { Box, Button, Dialog, DialogTitle, Grid, Typography,DialogContent,DialogActions, TextField } from '@material-ui/core';
 import { Link, useHistory, useLocation } from "react-router-dom";
 import React , {useState,useEffect} from 'react';
 import ListUser from '../listUser';
@@ -32,7 +32,7 @@ export default function Hall(props){
 
             if(response.status === 401)
             {
-                props.history.push('/');
+                history.replace('/');
             }
         }
 
@@ -63,7 +63,7 @@ export default function Hall(props){
             const idGameString = data.idGame.toString()
             joinGame(idGameString,location.state.idUser,(data)=>{
                 if(data.success === true){
-                    props.history.push({
+                    history.replace({
                         pathname: '/game/'+idGameString,
                         state: {idUser: location.state.idUser}});
                 }
@@ -121,7 +121,7 @@ export default function Hall(props){
 
         joinGame(idGame,location.state.idUser,(data)=>{
             if(data.success === true){
-                props.history.push({
+                history.replace({
                     pathname: '/game/'+idGame,
                     state: {idUser: location.state.idUser}});
             }
@@ -150,7 +150,7 @@ export default function Hall(props){
         {
             joinGame(idGame,location.state.idUser,(data)=>{
                 if(data.success === true){
-                    props.history.push({
+                    history.replace({
                         pathname: '/game/'+idGame,
                         state: {idUser: location.state.idUser}});
                 }
@@ -166,7 +166,7 @@ export default function Hall(props){
         
         joinGame(idGame,location.state.idUser,(data)=>{
             if(data.success === true){
-                props.history.push({
+                history.replace({
                     pathname: '/game/'+idGame,
                     state: {idUser: location.state.idUser}});
             }
@@ -185,7 +185,7 @@ export default function Hall(props){
 
     const handleLogOut = () => {
         localStorage.removeItem("token");
-        props.history.push("/");
+        history.replace("/");
     }
 
     return (

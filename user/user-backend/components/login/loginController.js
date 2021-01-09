@@ -1,7 +1,5 @@
 const jwt = require('jsonwebtoken');
 const fetch = require('node-fetch');
-const { use } = require('.');
-const { account } = require('../../connection');
 const accountService = require('../account/accountService');
 
 module.exports.loginAccount = async (req,res,next)=>{
@@ -22,7 +20,7 @@ module.exports.activate = async(req,res,next) =>
 {
     const activateId = req.query.id;
     await accountService.activate(activateId);
-    req.redirect('http:localhost:3001/login');
+    req.redirect('http:localhost:3001/');
 } 
 
 

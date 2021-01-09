@@ -47,6 +47,11 @@ export default function Login(props){
 
     const submitLogin = async (e) => {
         e.preventDefault();
+        if(loginData.username === '' || loginData.password === '')
+        {
+            setMessage("Username or password is empty");
+            return;
+        }
         const response = await fetch(URL.getUrl()+"login",{
             method: 'POST',
             headers: {
@@ -55,13 +60,14 @@ export default function Login(props){
             },
             body: JSON.stringify({
             username: loginData.username,
-            password: loginData.password})});        
+            password: loginData.password})});      
+
         if(response.status === 200)
         { 
             const data = await response.json();
             localStorage.setItem('token',data.token); 
             localStorage.setItem('user',data.account.id); 
-            props.history.push({
+            history.replace({
                 pathname: "/hall",
                 state: {
                     idUser : data.account.id}});            
@@ -100,7 +106,7 @@ export default function Login(props){
             const data = await response.json();
             localStorage.setItem('token',data.token); 
             localStorage.setItem('user',data.account.id); 
-            props.history.push({
+            history.replace({
                 pathname: "/hall",
                 state: {
                     idUser : data.account.id}});      
@@ -121,7 +127,7 @@ export default function Login(props){
             const data = await response.json();
             localStorage.setItem('token',data.token); 
             localStorage.setItem('user',data.account.id); 
-            props.history.push({
+            history.replace({
                 pathname: "/hall",
                 state: {
                     idUser : data.account.id}});      

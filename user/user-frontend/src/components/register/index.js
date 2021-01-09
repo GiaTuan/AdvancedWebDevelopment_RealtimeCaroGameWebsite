@@ -66,7 +66,7 @@ export default function Register(props){
         else
         {
             setIsSuccess(true);
-            setMessage("Register successfully");
+            setMessage("Register successfully, please check email to activate your account");
         }
     }
 

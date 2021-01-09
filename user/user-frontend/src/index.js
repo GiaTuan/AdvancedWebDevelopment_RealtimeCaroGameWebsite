@@ -14,9 +14,9 @@ import ChangePassword from './components/changePassword';
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <Route exact path="/" component={Login} exact></Route>
-      <Route exact path="/forgetPassword" component={ForgetPassword} exact></Route>
-      <Route exact path="/register" component={Register} exact></Route>
+      <Route exact path="/" component={Login}></Route>
+      <Route exact path="/forgetPassword" component={ForgetPassword}></Route>
+      <Route exact path="/register" component={Register}></Route>
       <Route path="/hall" component={Hall} exact></Route>
       <Route path="/history/:id" component={GameDetail} exact></Route>
       <Route path="/history" component={History} exact></Route>
@@ -31,26 +31,3 @@ ReactDOM.render(
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-
-
-/*
-// Renderer callback with condition
-const renderer = ({ hours, minutes, seconds, completed }) => {
-  if (completed) {
-    // Render a completed state
-    return <Completionist />;
-  } else {
-    // Render a countdown
-    return <span>{seconds}</span>;
-  }
-};
-
-ReactDOM.render(
-  <Countdown date={Date.now() + 30000} renderer={renderer} />,
-  document.getElementById("root")
-);
-
-
-
-
-*/

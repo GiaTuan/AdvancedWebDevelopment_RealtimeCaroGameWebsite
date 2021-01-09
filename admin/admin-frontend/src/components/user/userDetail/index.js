@@ -1,7 +1,6 @@
-import { Box, Button, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@material-ui/core';
+import { Box, Button, Grid, Typography } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
 import Header from '../../header';
 import URL from '../../url';
 
@@ -104,6 +103,23 @@ export default function UserDetail(props){
                                 </Typography>
                             </Grid>
                             <Grid item>
+                                {
+                                    user.isadmin ?                                  
+                                    <Typography variant="h6">
+                                       <b>Admin</b>
+                                    </Typography>
+                                    :
+                                    <Typography variant="h6">
+                                       <b>Member
+                                       {
+                                            user.isblocked ? 
+                                                <span> (Blocked)</span>
+                                            : null
+                                        }</b>
+                                    </Typography>
+                                }
+                            </Grid>
+                            <Grid item>
                                 <Typography>
                                     <b>ID:</b> {user.id}
                                 </Typography>
@@ -135,28 +151,11 @@ export default function UserDetail(props){
                             </Grid>
                             <Grid item>
                                 <Typography>
-                                    <b>&#9818; Total wins:</b> {user.totalwins} ({user.totalwins/user.totalplays*100}%)
+                                    <b>&#9818; Total wins:</b> {user.totalwins} ({(user.totalwins/user.totalplays*100,3).toFixed(3)}%)
                                 </Typography>
                             </Grid>
                             <Grid item>
-                                {
-                                    user.isadmin ?                                  
-                                    <Typography>
-                                       Is Admin
-                                    </Typography>
-                                    :
-                                    <Typography>
-                                       Is Member
-                                    </Typography>
-                                }
-                            </Grid>
-                            <Grid item>
-                                {
-                                    user.isblocked ? 
-                                    <Typography variant="h5">
-                                        Blocked
-                                    </Typography> : null
-                                }
+                                
                             </Grid>
                             <br></br>
                             <Grid item>

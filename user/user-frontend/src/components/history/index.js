@@ -20,7 +20,7 @@ export default function History(props){
 
             if(response.status === 401)
             {
-                history.push('/');
+                history.replace('/');
             }
         }
 

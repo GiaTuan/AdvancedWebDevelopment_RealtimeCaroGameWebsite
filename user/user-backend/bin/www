@@ -9,7 +9,6 @@ const app = require('../app');
 const debug = require('debug')('user-backend:server');
 const http = require('http');
 const socketIO = require('socket.io');
-const { use } = require('passport');
 const gameService = require('../components/game/gameService');
 const chatService = require('../components/chat/chatService');
 const accountService = require('../components/account/accountService');
@@ -67,13 +66,12 @@ io.on("connection", (socket) => {
       }
     }
     socket.join(data.idGame);
-    socket.emit("join-respond", {success: true});
-
     let board = [];
     for(let i = 0 ; i < rooms[data.idGame].board.length; i++)
     {
       board = board.concat(rooms[data.idGame].board[i]);
     }
+    io.to(socket.id).emit("join-respond", {success: true});
     io.to(data.idGame).emit("board-respond",{board: board, history: rooms[data.idGame].history, winner: rooms[data.idGame].winner});
     io.to(data.idGame).emit("chat",rooms[data.idGame].chat);
     io.to(data.idGame).emit("players", {players : rooms[data.idGame].players});
@@ -122,7 +120,6 @@ io.on("connection", (socket) => {
     {
       io.to(socket.id).emit("play-game", {success: false});
       io.to(data.idGame).emit("players",{players : rooms[data.idGame].players});
-
     }
   });
 
@@ -150,8 +147,10 @@ io.on("connection", (socket) => {
     if(check)
     {
       rooms[data.idGame].winner = await accountService.getUserFromId(data.idUser);
+      const winnerId = data.idUser;
+      const loserId = rooms[data.idGame].players[0].id === data.idUser ? rooms[data.idGame].players[1].id : rooms[data.idGame].players[0].id;
       await gameService.addWinner(data.idGame,data.idUser);
-      await accountService.updateWinner(data.idUser);
+      await accountService.updateWinner(winnerId,loserId);
     }
 
     //convert to 1d array to send back to ui and save db
@@ -189,11 +188,23 @@ io.on("connection", (socket) => {
   })
 
   socket.on("give-in", async(data)=>{
-    console.log(data);
-    rooms[data.idGame].winner = rooms[data.idGame].players[0].id === data.idUser ? data.idUserrooms[data.idGame].players[1] : rooms[data.idGame].players[0];
+    if(rooms[data.idGame].players.length === 0)
+    {
+      return;
+    }
+
+    if(!rooms[data.idGame].players.some(obj => obj.id === data.idUser)) return;
+
+    if(Object.keys(rooms[data.idGame].winner).length !== 0)
+    {
+      return;
+    }
+    rooms[data.idGame].winner = rooms[data.idGame].players[0].id === data.idUser ? rooms[data.idGame].players[1] : rooms[data.idGame].players[0];
+    const winnerId = rooms[data.idGame].winner.id;
+    const loserId = rooms[data.idGame].players[0].id === data.idUser ? rooms[data.idGame].players[0].id : rooms[data.idGame].players[1].id;
     await gameService.addWinner(data.idGame,rooms[data.idGame].winner.id);
-      await accountService.updateWinner(rooms[data.idGame].winner.id);
-    io.to(data.idGame).emit("give-in",{message: 'User ID ' + data.idUser + ' gives in',winner: rooms[data.idGame].winner});
+    await accountService.updateWinner(winnerId,loserId);
+    io.to(data.idGame).emit("give-in",{message: 'User ID ' + data.idUser + ' gave in', winner: rooms[data.idGame].winner});
   })
 
   socket.on("disconnect", () => {

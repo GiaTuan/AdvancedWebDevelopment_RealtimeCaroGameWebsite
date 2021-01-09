@@ -23,7 +23,7 @@ export default function ChangePassword(props){
 
             if(response.status === 401)
             {
-                history.push('/');
+                history.replace('/');
             }
         }
 
